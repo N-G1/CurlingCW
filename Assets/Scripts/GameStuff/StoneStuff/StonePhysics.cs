@@ -8,17 +8,28 @@ public class StonePhysics : MonoBehaviour
 { 
     private Rigidbody rb;
     private Collider col;
-    // Assign custom material to each stone
+
+    private const float friction = 0.03f; //object friction
+    private const float bounce = 0.95f; // allows for bouncing off walls / other stones
+    private const float drag = 0f; 
+    private const float angDrag = 0.01f; 
+
+    // Assign custom material to each stone, set up physics stuff 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 
+        rb.angularDrag = angDrag;
+        rb.drag = drag;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous; //continous for less inaccurate collisions at high speeds 
+        rb.freezeRotation = true;
+
         col.material = new PhysicMaterial
         {
-            dynamicFriction = 0.03f,
-            staticFriction = 0.03f,
-            bounciness = 0.75f,   
+            dynamicFriction = friction,
+            staticFriction = friction,
+            bounciness = bounce, 
         };
     }
 

@@ -16,13 +16,19 @@ public class DecideDirection : MonoBehaviour
     private Rigidbody stoneRb;
     private float velocityTimeLimit = 0.5f;
     private float timeUnderVelocity = 0f;
+    private bool moving = false;
 
     private PlayStateManager psm;
 
+    private const float slideModifier = 0.05f; //small modifier applied to simulate longer sliding
+    private const float velocityModifier = 10f; //initial force applied
+
+
+    //init stone and stone rb 
     void Start()
     {
         psm = PlayStateManager.PSMInstance;
-        stone = GameObject.FindGameObjectWithTag("Stone");
+        stone = GameObject.FindGameObjectWithTag("CurrStone");
         stoneRb = stone.GetComponent<Rigidbody>();
     }
 
@@ -32,11 +38,21 @@ public class DecideDirection : MonoBehaviour
         moveStone();
     }
 
+    //apply slide modifier
+    void FixedUpdate()
+    {
+        if (moving)
+        {
+            stoneRb.AddForce(-transform.forward * slideModifier, ForceMode.Impulse);
+        }
+    }
+
     private void moveStone()
     {
         //if user clicks and is aiming 
         if (Input.GetMouseButtonDown(0) && psm.getPlayState() == PlayStateManager.PlayStates.Aiming)
         {
+            moving = true;
             psm.setPlayState(PlayStateManager.PlayStates.Directing);
             handlePhysics();      
         }
@@ -52,8 +68,13 @@ public class DecideDirection : MonoBehaviour
             //prevents instantly changing stone if it briefly stops 
             if (timeUnderVelocity > velocityTimeLimit)
             {
+                moving = false;
+
+                stone.tag = "Untagged"; 
                 stone = Instantiate(stonePrefab, stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
+                stone.tag = "CurrStone";
                 stoneRb = stone.GetComponent<Rigidbody>();
+
                 mainCam.transform.position = stone.transform.GetChild(0).position;
                 mainCam.transform.parent = stone.transform.GetChild(0);
 
@@ -69,6 +90,6 @@ public class DecideDirection : MonoBehaviour
     {
         //awkward orientation stuff pivot is actually facing backwards for some reason 
         Vector3 direction = -pivot.forward;
-        stoneRb.velocity = direction * 15f;
+        stoneRb.velocity = direction * velocityModifier;
     }
 }
