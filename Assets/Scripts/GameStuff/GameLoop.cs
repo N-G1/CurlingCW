@@ -12,6 +12,7 @@ public class GameLoop : MonoBehaviour
     {
         mainCam = Camera.main;
         mainCam.transform.position = cameraPos.position;
+        mainCam.transform.rotation = cameraPos.rotation;
     }
 
     // Update is called once per frame
