@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5482784252061747414}
   - component: {fileID: 8157353602991816984}
   - component: {fileID: 769370464438317839}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ GameObject:
   m_Component:
   - component: {fileID: 884516562528856986}
   - component: {fileID: -5231786081464173095}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CrowdMemberLarge
   m_TagString: Crowd
   m_Icon: {fileID: 0}
@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 7621649874535332760}
   - component: {fileID: 4093336657582523315}
   - component: {fileID: 841819476562019035}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}

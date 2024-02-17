@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 456174812707494742}
   - component: {fileID: 7170813514421586522}
   - component: {fileID: 7214289024702905106}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8025569077199224143}
   - component: {fileID: 3543187202449119490}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: CrowdMemberSmall
   m_TagString: Crowd
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ Transform:
   - {fileID: 1054120620514307014}
   - {fileID: 3842051233780828706}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &3543187202449119490
 Rigidbody:
@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 4516902645842515596}
   - component: {fileID: 5586740165500073856}
   - component: {fileID: 4161823167632994755}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
