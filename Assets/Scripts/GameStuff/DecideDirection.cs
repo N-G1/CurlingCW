@@ -21,7 +21,7 @@ public class DecideDirection : MonoBehaviour
     private PlayStateManager psm;
 
     private const float slideModifier = 0.05f; //small modifier applied to simulate longer sliding
-    private const float velocityModifier = 10f; //initial force applied
+    private const float velocityModifier = 12.5f; //initial force applied
 
 
     //init stone and stone rb 
