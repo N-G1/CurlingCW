@@ -11,6 +11,7 @@ public class PlayStateManager : MonoBehaviour
     //aiming = initial direction with arrow, directing = moving stone in play 
     public enum PlayStates { Directing, Aiming, EnemyTurn }
     private PlayStates currPlayState;
+    private PlayStates prevPlayState;
     private MeshRenderer[] arrowMeshes;
     public static PlayStateManager PSMInstance;
 
@@ -66,5 +67,14 @@ public class PlayStateManager : MonoBehaviour
     public PlayStates getPlayState()
     {
         return currPlayState;
+    }
+
+    public void setPrevPlayState(PlayStates input)
+    {
+        prevPlayState = input;
+    }
+    public PlayStates getPrevPlayState()
+    {
+        return prevPlayState;
     }
 }

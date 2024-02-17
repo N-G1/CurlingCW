@@ -10,7 +10,7 @@ public class DecideDirection : MonoBehaviour
     [SerializeField] private GameObject stoneHolder;
     [SerializeField] private Camera mainCam;
     [SerializeField] private Transform pivot;
-    [SerializeField] private GameObject stonePrefab;
+    [SerializeField] private GameObject[] stonePrefabs;
 
     private GameObject stone;
     private Rigidbody stoneRb;
@@ -54,6 +54,7 @@ public class DecideDirection : MonoBehaviour
         {
             moving = true;
             psm.setPlayState(PlayStateManager.PlayStates.Directing);
+            psm.setPrevPlayState(PlayStateManager.PlayStates.Aiming);
             handlePhysics();      
         }
     }
@@ -69,17 +70,29 @@ public class DecideDirection : MonoBehaviour
             if (timeUnderVelocity > velocityTimeLimit)
             {
                 moving = false;
-
                 stone.tag = "Untagged"; 
-                stone = Instantiate(stonePrefab, stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
+
+                //Aiming -> Directing -> EnemyTurn -> Directing -> Aiming -> ...
+
+                //if youve just come from aiming then its your turn 
+                if (psm.getPrevPlayState() == PlayStateManager.PlayStates.Aiming)
+                {
+                    stone = Instantiate(stonePrefabs[0], stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
+                    psm.setPlayState(PlayStateManager.PlayStates.Aiming); //needs to be changed to enemyTeam when implemented
+                }
+                //if youve just come from enemy turn then its other teams turn
+                else if (psm.getPrevPlayState() == PlayStateManager.PlayStates.EnemyTurn)
+                {
+                    stone = Instantiate(stonePrefabs[1], stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
+                    psm.setPlayState(PlayStateManager.PlayStates.Aiming);
+                }
+                
                 stone.tag = "CurrStone";
                 stoneRb = stone.GetComponent<Rigidbody>();
 
                 mainCam.transform.position = stone.transform.GetChild(0).position;
                 mainCam.transform.parent = stone.transform.GetChild(0);
 
-                //or enemy when other team is implemented
-                psm.setPlayState(PlayStateManager.PlayStates.Aiming);
                 timeUnderVelocity = 0f;
             }   
         }

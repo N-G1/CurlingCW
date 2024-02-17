@@ -6,8 +6,8 @@ TagManager:
   tags:
   - Crowd
   - Spawn
-  - Stone
   - CameraPos
+  - CurrStone
   layers:
   - Default
   - TransparentFX
