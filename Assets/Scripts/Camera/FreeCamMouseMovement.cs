@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FreeCamMovement : MonoBehaviour
 {
-
+    //TODO only allow freecam to be accessed before stone has been pushed, prob use an enum for 'in play'/'not in play'
     private const float mouseSens = 50;
     private float xRotation = 0, yRotation = 0;
     [SerializeField] private Transform rbHolder;
@@ -12,6 +12,7 @@ public class FreeCamMovement : MonoBehaviour
     private void Start()
     {
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
