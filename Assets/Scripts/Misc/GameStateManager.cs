@@ -13,8 +13,8 @@ public class GameStateManager : MonoBehaviour
     public static GameStateManager GSMInstance;
     //unload stones on gameended, load them on play, so never loaded on main menu 
 
-    //singleton used to access the gsm in other scripts without having to call something like FindObjectOfType constantly
-    private void Awake()
+    //singleton used to access the gsm in other scripts via instance 
+    void Awake()
     {
         if (GSMInstance == null)
         {
