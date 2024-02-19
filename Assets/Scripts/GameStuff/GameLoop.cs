@@ -44,7 +44,7 @@ public class GameLoop : MonoBehaviour
         }
     }
 
-    //init stone and stone rb 
+    //init stone, stone rb and camera
     void Start()
     {
         mainCam = Camera.main;
@@ -89,7 +89,7 @@ public class GameLoop : MonoBehaviour
     //TEMP IMPLEMENTATION 
     IEnumerator tempFunction()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f); //needs to be small 
         stoneRb.isKinematic = true;
     }  
 
@@ -108,7 +108,7 @@ public class GameLoop : MonoBehaviour
     private void moveStone()
     {
         //if user clicks and is aiming 
-        if (Input.GetMouseButtonDown(0) && psm.getPlayState() == PlayStateManager.PlayStates.Aiming)
+        if (Input.GetMouseButtonDown(0) && psm.getPlayState() == PlayStateManager.PlayStates.Aiming && Camera.main == mainCam)
         {
             moving = true;
             psm.setPlayState(PlayStateManager.PlayStates.Directing);
@@ -166,8 +166,7 @@ public class GameLoop : MonoBehaviour
 
     private bool CheckGameEnded()
     {
-        //Handling round ending here ensures it is at the very end of a round
-        //(when final enemy stone stops moving)
+        //Check when movement has stopped on the final stone of a round
         if (psm.getStonesUsed() == PlayStateManager.stoneLimit && teamInPlay == 1 && moving == false)
         {
             psm.setPlayState(PlayStateManager.PlayStates.RoundEnded);

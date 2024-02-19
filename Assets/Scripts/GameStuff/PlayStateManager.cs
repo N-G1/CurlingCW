@@ -32,7 +32,7 @@ public class PlayStateManager : MonoBehaviour
 
 
     //number of stones each team has each round 
-    public const int stoneLimit = 1;
+    public const int stoneLimit = 3;
 
 
     //Singleton used same as GSM to access in other scripts, not sure if this is the most 
@@ -49,6 +49,7 @@ public class PlayStateManager : MonoBehaviour
         }
 
         currPlayState = PlayStates.Aiming;
+        winningTeam = "None";
     }
 
     void Start()
@@ -109,9 +110,13 @@ public class PlayStateManager : MonoBehaviour
             enemyPoints += getRoundPoints();
             incrementedPoints = true;
         }
-        //
+        /////////////////////
 
-        winningTeam = playerPoints > enemyPoints ? "Player" : "Enemy";
+        if (playerPoints != 0 || enemyPoints != 0)
+        {
+            winningTeam = playerPoints > enemyPoints ? "Player" : "Enemy";
+        }
+        
 
         //TEMP IMPLEMENTATION
         txtTemp.text = (winningTeam + ": " + playerPoints);
