@@ -23,7 +23,7 @@ public class ADMoveStone : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (psm.getPlayState() == PlayStateManager.PlayStates.Directing)
+        if (psm.getPlayState() == PlayStateManager.PlayStates.Directing && psm.getPrevPlayState() != PlayStateManager.PlayStates.EnemyTurn)
         {
             //pretty ineficient, TODO change 
             currStone = GameObject.FindGameObjectWithTag("CurrStone");

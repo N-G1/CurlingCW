@@ -8,6 +8,7 @@ TagManager:
   - Spawn
   - CameraPos
   - CurrStone
+  - Stone
   layers:
   - Default
   - TransparentFX
@@ -16,9 +17,9 @@ TagManager:
   - Water
   - UI
   - Main Cam Visible
-  - 
-  - 
-  - 
+  - Stone
+  - PlayerTeam
+  - EnemyTeam
   - 
   - 
   - 

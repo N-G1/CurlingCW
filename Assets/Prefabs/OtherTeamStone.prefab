@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 9179098374534928333}
   - component: {fileID: 6806957280598609956}
   - component: {fileID: 2122325299421201537}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2309,7 +2309,7 @@ GameObject:
   - component: {fileID: 3431478799140158673}
   - component: {fileID: 4326232825754693871}
   - component: {fileID: 4397935692422350514}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2978,7 +2978,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8411230363673618691}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: CameraPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3016,7 +3016,7 @@ GameObject:
   - component: {fileID: 2999606391022445206}
   - component: {fileID: 7582194035476531592}
   - component: {fileID: 3165714366259378653}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: OtherTeamStone
   m_TagString: CurrStone
   m_Icon: {fileID: 0}
@@ -4231,7 +4231,7 @@ GameObject:
   - component: {fileID: 1097834466858110842}
   - component: {fileID: 6400023816420632907}
   - component: {fileID: 9101371128142395837}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
