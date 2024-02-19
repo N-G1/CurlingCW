@@ -17,16 +17,32 @@ public class GameLoop : MonoBehaviour
     private Camera mainCam;
     private GameObject stone;
     private Rigidbody stoneRb;
+
     private float velocityTimeLimit = 0.5f;
     private float timeUnderVelocity = 0f;
+
     private bool moving = false;
     private int teamInPlay = 1;
+    private bool ended = false;
 
     private PlayStateManager psm;
 
     private const float slideModifier = 0.05f; //small modifier applied to simulate longer sliding
-    private const float velocityModifier = 12.5f; //initial force applied
+    private const float velocityModifier = 13f; //initial force applied
 
+    public static GameLoop GLInstance;
+
+    private void Awake()
+    {
+        if (GLInstance == null)
+        {
+            GLInstance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     //init stone and stone rb 
     void Start()
@@ -41,29 +57,33 @@ public class GameLoop : MonoBehaviour
     }
 
     void Update()
-    {   
-        if (psm.getPlayState() != PlayStateManager.PlayStates.EnemyTurn && teamInPlay == 1)
+    {
+        ended = CheckGameEnded();
+
+        if (!ended)
         {
+            if (psm.getPlayState() != PlayStateManager.PlayStates.EnemyTurn && teamInPlay == 1)
+            {
+                moveStone();
+
+                //TEMP IMPLEMENTATION 
+                stoneRb.isKinematic = false;
+            }
+            else
+            {
+                //TODO do the enemy moving the stone here ALL TEMP IMPLEMENTATION 
+                stoneRb.velocity = new Vector3(0, 0, -1) * velocityModifier;
+                moving = true;
+                StartCoroutine(tempFunction());
+                //
+
+
+                psm.setPlayState(PlayStateManager.PlayStates.Directing);
+                psm.setPrevPlayState(PlayStateManager.PlayStates.EnemyTurn);
+
+            }
             velocityCheck();
-            moveStone();
-
-            //TEMP IMPLEMENTATION 
-            stoneRb.isKinematic = false;
-        }
-
-        else 
-        {
-            //TODO do the enemy moving the stone here ALL TEMP IMPLEMENTATION 
-            stoneRb.velocity = new Vector3(0,0,-1) * velocityModifier;
-            moving = true;
-            StartCoroutine(tempFunction());
-            //
-
-
-            psm.setPlayState(PlayStateManager.PlayStates.Directing);
-            psm.setPrevPlayState(PlayStateManager.PlayStates.EnemyTurn);
-            velocityCheck();
-        }
+        } 
     }
 
     //TEMP IMPLEMENTATION 
@@ -113,14 +133,6 @@ public class GameLoop : MonoBehaviour
                 moving = false;
                 stone.tag = "Stone";
 
-                //Handling round ending here ensures it is at the very end of a round
-                //(when final enemy stone stops moving)
-                if (psm.getStonesUsed() == PlayStateManager.stoneLimit)
-                {
-                    psm.setPlayState(PlayStateManager.PlayStates.RoundEnded);
-                    psm.setPrevPlayState(PlayStateManager.PlayStates.EnemyTurn);
-                }
-
                 //For reference below: Aiming -> Directing -> EnemyTurn -> Directing -> Aiming -> ....
 
                 //if youve just come from aiming then its your turn directing 
@@ -152,11 +164,33 @@ public class GameLoop : MonoBehaviour
         }
     }
 
+    private bool CheckGameEnded()
+    {
+        //Handling round ending here ensures it is at the very end of a round
+        //(when final enemy stone stops moving)
+        if (psm.getStonesUsed() == PlayStateManager.stoneLimit && teamInPlay == 1 && moving == false)
+        {
+            psm.setPlayState(PlayStateManager.PlayStates.RoundEnded);
+            psm.setPrevPlayState(PlayStateManager.PlayStates.EnemyTurn);
+            return true;
+        }
+        return false;
+    }
+
     //new stones are assigned as the primary stone once the previous one has stopped moving
     private void handlePhysics()
     {
         //awkward orientation stuff pivot is actually facing backwards for some reason 
         Vector3 direction = -pivot.forward;
         stoneRb.velocity = direction * velocityModifier;
+    }
+
+    public bool getEnded()
+    {
+        return ended;
+    }
+    public void setEnded(bool val)
+    {
+        ended = val;
     }
 }

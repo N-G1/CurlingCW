@@ -19,14 +19,20 @@ public class PlayStateManager : MonoBehaviour
     public enum PlayStates { Directing, Aiming, EnemyTurn, RoundEnded }
     private PlayStates currPlayState;
     private PlayStates prevPlayState;
+    private GameLoop gl;
 
     private MeshRenderer[] arrowMeshes;
     public static PlayStateManager PSMInstance;
+    
+
     private int roundPoints = 0, stonesUsed = 0;
+    private int playerPoints, enemyPoints = 0;
     private string winningTeam;
+    private bool incrementedPoints = false;
+
 
     //number of stones each team has each round 
-    public const int stoneLimit = 3;
+    public const int stoneLimit = 1;
 
 
     //Singleton used same as GSM to access in other scripts, not sure if this is the most 
@@ -48,6 +54,7 @@ public class PlayStateManager : MonoBehaviour
     void Start()
     {
         arrowMeshes = arrow.GetComponentsInChildren<MeshRenderer>();
+        gl = GameLoop.GLInstance;
     }
 
     void Update()
@@ -56,6 +63,7 @@ public class PlayStateManager : MonoBehaviour
         {
             case PlayStates.Aiming:
                 ChangeArrowVisibility(true);
+                incrementedPoints = false;
                 break;
             case PlayStates.Directing:
                 ChangeArrowVisibility(false);
@@ -89,8 +97,19 @@ public class PlayStateManager : MonoBehaviour
         gameUI.enabled = false;
         roundUI.enabled = true;
 
+        if (winningTeam == "Player" && !incrementedPoints)
+        {
+            playerPoints += getRoundPoints();
+            incrementedPoints = true;
+        }
+        else if (!incrementedPoints)
+        {
+            enemyPoints += getRoundPoints();
+            incrementedPoints = true;
+        }
+
         //TEMP IMPLEMENTATION
-        txtTemp.text = (winningTeam + ": " + roundPoints);
+        txtTemp.text = (winningTeam + ": " + playerPoints);
 
         //wait 3 seconds to view leaderboard then start new round 
         StartCoroutine(NewRound());
@@ -113,6 +132,9 @@ public class PlayStateManager : MonoBehaviour
 
         setRoundPoints(0);
         setStonesUsed(0);
+
+        //set gameEnded as false so gameloop can resume
+        gl.setEnded(false);
     }
 
     /// <summary>

@@ -37,7 +37,7 @@ public class PointCheck : MonoBehaviour
             alreadyChecked = true; 
         }
         //if has been round end, clear everything 
-        else if (psm.getPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
+        if (psm.getPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
         {
             alreadyChecked = false;
             pointsAwarded = 0;
