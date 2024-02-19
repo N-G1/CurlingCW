@@ -27,7 +27,7 @@ public class PlayStateManager : MonoBehaviour
 
     private int roundPoints = 0, stonesUsed = 0;
     private int playerPoints, enemyPoints = 0;
-    private string winningTeam;
+    private string roundWinningTeam, winningTeam;
     private bool incrementedPoints = false;
 
 
@@ -97,7 +97,9 @@ public class PlayStateManager : MonoBehaviour
         gameUI.enabled = false;
         roundUI.enabled = true;
 
-        if (winningTeam == "Player" && !incrementedPoints)
+
+        //TEMP IMPLEMENTATION
+        if (roundWinningTeam == "Player" && !incrementedPoints)
         {
             playerPoints += getRoundPoints();
             incrementedPoints = true;
@@ -107,6 +109,9 @@ public class PlayStateManager : MonoBehaviour
             enemyPoints += getRoundPoints();
             incrementedPoints = true;
         }
+        //
+
+        winningTeam = playerPoints > enemyPoints ? "Player" : "Enemy";
 
         //TEMP IMPLEMENTATION
         txtTemp.text = (winningTeam + ": " + playerPoints);
@@ -177,13 +182,13 @@ public class PlayStateManager : MonoBehaviour
     {
         return roundPoints;
     }
-    public void setWinnignTeam(string input)
+    public void setRoundWinnignTeam(string input)
     {
-        winningTeam = input;
+        roundWinningTeam = input;
     }
-    public string getWinningTeam()
+    public string getRoundWinningTeam()
     {
-        return winningTeam;
+        return roundWinningTeam;
     }
     public void setStonesUsed(int input)
     {

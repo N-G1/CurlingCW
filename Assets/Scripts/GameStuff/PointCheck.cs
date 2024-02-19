@@ -117,6 +117,6 @@ public class PointCheck : MonoBehaviour
     void passValsToPSM(int points, string team)
     {
         psm.setRoundPoints(points);
-        psm.setWinnignTeam(team);
+        psm.setRoundWinnignTeam(team);
     }
 }

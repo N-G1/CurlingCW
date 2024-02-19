@@ -89,7 +89,7 @@ public class GameLoop : MonoBehaviour
     //TEMP IMPLEMENTATION 
     IEnumerator tempFunction()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         stoneRb.isKinematic = true;
     }  
 
