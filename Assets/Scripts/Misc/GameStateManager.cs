@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameStateManager : MonoBehaviour
 {
     //TODO add functionality to remember last screen and reformat 
-    [SerializeField] private GameObject gameEndedUI, gameUI, pauseUI;
+    [SerializeField] private Canvas gameEndedUI, gameUI, pauseUI;
+    [SerializeField] private TextMeshProUGUI txtFinalDisplay;
 
     public enum MenuStates { MainMenu, GameEnded, Pause, Play }
     private MenuStates currState, prevState;
     public static GameStateManager GSMInstance;
-    //unload stones on gameended, load them on play, so never loaded on main menu 
+    private PlayStateManager psm;
 
     //singleton used to access the gsm in other scripts via instance 
     void Awake()
@@ -31,7 +33,7 @@ public class GameStateManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        psm = PlayStateManager.PSMInstance;
     }
 
     // Update is called once per frame
@@ -77,13 +79,15 @@ public class GameStateManager : MonoBehaviour
     }
     private void GameEnded()
     {
-
+        gameEndedUI.enabled = true;
+        gameUI.enabled = false;
+        txtFinalDisplay.text = string.Format("Player: {0}\nOpponent: {1}", psm.getPlayerPoints(), psm.getEnemyPoints());
     }
     private void PauseMenu()
     {
         CursorUnlock();
-        pauseUI.GetComponent<Canvas>().enabled = true;
-        gameUI.GetComponent<Canvas>().enabled = false;
+        pauseUI.enabled = true;
+        gameUI.enabled = false;
         Time.timeScale = 0;
     }
 
@@ -91,7 +95,7 @@ public class GameStateManager : MonoBehaviour
     {
         CheckPrevScreen();
         CursorLock();
-        gameUI.GetComponent<Canvas>().enabled = true;
+        gameUI.enabled = true;
     }
 
     //Unlocks cursor
@@ -119,7 +123,7 @@ public class GameStateManager : MonoBehaviour
                 break;
             case MenuStates.Pause:
                 Time.timeScale = 1;
-                pauseUI.GetComponent<Canvas>().enabled = false;
+                pauseUI.enabled = false;
                 break;
         }
     }

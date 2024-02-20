@@ -29,10 +29,15 @@ public class PlayStateManager : MonoBehaviour
     private int playerPoints, enemyPoints = 0;
     private string roundWinningTeam, winningTeam;
     private bool incrementedPoints = false;
+    private GameStateManager gsm;
+    private bool hasBeenSet = false;
+    private bool stoneHasBeenIncremented = false;
 
 
     //number of stones each team has each round 
-    public const int stoneLimit = 3;
+    public const int stoneLimit = 1;
+    //number of ends 
+    private int ends = 2, endsPlayed = 0;
 
 
     //Singleton used same as GSM to access in other scripts, not sure if this is the most 
@@ -56,6 +61,7 @@ public class PlayStateManager : MonoBehaviour
     {
         arrowMeshes = arrow.GetComponentsInChildren<MeshRenderer>();
         gl = GameLoop.GLInstance;
+        gsm = GameStateManager.GSMInstance;
     }
 
     void Update()
@@ -65,18 +71,37 @@ public class PlayStateManager : MonoBehaviour
             case PlayStates.Aiming:
                 ChangeArrowVisibility(true);
                 incrementedPoints = false;
+                hasBeenSet = false;
+                stoneHasBeenIncremented = false;
                 break;
             case PlayStates.Directing:
                 ChangeArrowVisibility(false);
                 break;
             case PlayStates.EnemyTurn:
-                ChangeArrowVisibility(false);
-                //as enemyTurn will be last before round end, increment here 
-                setStonesUsed(getStonesUsed() + 1);
+                if (!stoneHasBeenIncremented)
+                {
+                    setStonesUsed(getStonesUsed() + 1);
+                    stoneHasBeenIncremented = true;
+                }
                 break;
             case PlayStates.RoundEnded:
-                RoundEnded();
-                //display rounded ended UI for 3 seconds, disable controls 
+                //prevents setEndsPlayed being set more than once a round
+                IncrementScore();
+                if (!hasBeenSet)
+                {
+                    setEndsPlayed(getEndsPlayed() + 1);
+                    hasBeenSet = true;
+                }
+                if (getEndsPlayed() != ends)
+                {
+                    RoundEnded();
+                }
+                else
+                {
+                    ChangeArrowVisibility(false);
+                    gsm.setCurrState(GameStateManager.MenuStates.GameEnded);
+                    gsm.setPrevState(GameStateManager.MenuStates.Play);
+                }
                 break;
         }
     }
@@ -93,13 +118,9 @@ public class PlayStateManager : MonoBehaviour
         }
     }
 
-    void RoundEnded()
+    void IncrementScore()
     {
-        gameUI.enabled = false;
-        roundUI.enabled = true;
-
-
-        //TEMP IMPLEMENTATION
+        //TEMP IMPLEMENTATION - maybe not temp actually 
         if (roundWinningTeam == "Player" && !incrementedPoints)
         {
             playerPoints += getRoundPoints();
@@ -110,17 +131,22 @@ public class PlayStateManager : MonoBehaviour
             enemyPoints += getRoundPoints();
             incrementedPoints = true;
         }
-        /////////////////////
+    }
+
+    void RoundEnded()
+    {
+        gameUI.enabled = false;
+        roundUI.enabled = true;
 
         if (playerPoints != 0 || enemyPoints != 0)
         {
             winningTeam = playerPoints > enemyPoints ? "Player" : "Enemy";
         }
+
+        txtTemp.text = string.Format("{0}: {1}", winningTeam, playerPoints);
+
+        IncrementScore();
         
-
-        //TEMP IMPLEMENTATION
-        txtTemp.text = (winningTeam + ": " + playerPoints);
-
         //wait 3 seconds to view leaderboard then start new round 
         StartCoroutine(NewRound());
     }
@@ -202,5 +228,21 @@ public class PlayStateManager : MonoBehaviour
     public int getStonesUsed()
     {
         return stonesUsed;
+    }
+    public void setEndsPlayed(int input)
+    {
+        endsPlayed = input;
+    }
+    public int getEndsPlayed()
+    {
+        return endsPlayed;
+    }
+    public int getPlayerPoints()
+    {
+        return playerPoints;
+    }
+    public int getEnemyPoints()
+    {
+        return enemyPoints;
     }
 }

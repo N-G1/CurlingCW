@@ -20,5 +20,11 @@ public class RotateArrow : MonoBehaviour
             //only rotate in x is neccessary 
             transform.rotation = Quaternion.Euler(0f, rotationWindow, 0f);
         }
+        else if (psm.getPlayState() == PlayStateManager.PlayStates.EnemyTurn)
+        {
+            float rotation = Mathf.PingPong(Time.time * 0.85f, 1f);
+            float rotationWindow = Mathf.Lerp(-15, 15, rotation);
+            transform.rotation = Quaternion.Euler(0f, rotationWindow, 0f);
+        }
     }
 }
