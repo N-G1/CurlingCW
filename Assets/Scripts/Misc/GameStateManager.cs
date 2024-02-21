@@ -9,6 +9,7 @@ public class GameStateManager : MonoBehaviour
     //TODO add functionality to remember last screen and reformat 
     [SerializeField] private Canvas gameEndedUI, gameUI, pauseUI;
     [SerializeField] private TextMeshProUGUI txtFinalDisplay;
+    [SerializeField] private AudioSource camAudioSource;
 
     public enum MenuStates { MainMenu, GameEnded, Pause, Play }
     private MenuStates currState, prevState;
@@ -56,7 +57,7 @@ public class GameStateManager : MonoBehaviour
         {
             case MenuStates.MainMenu:
                 CursorUnlock();
-                MainMenu();
+                mainMenu();
                 break;
             case MenuStates.GameEnded:
                 CursorUnlock();
@@ -73,7 +74,7 @@ public class GameStateManager : MonoBehaviour
     }
 
 
-    private void MainMenu()
+    private void mainMenu()
     {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
@@ -88,6 +89,7 @@ public class GameStateManager : MonoBehaviour
         CursorUnlock();
         pauseUI.enabled = true;
         gameUI.enabled = false;
+        camAudioSource.Pause();
         Time.timeScale = 0;
     }
 
@@ -116,16 +118,19 @@ public class GameStateManager : MonoBehaviour
     //checks the previous screen and hides the relevant UI
     private void CheckPrevScreen()
     {
-        switch (prevState)
+        if (getPrevState() == MenuStates.Pause)
         {
-            case MenuStates.GameEnded:
-                //
-                break;
-            case MenuStates.Pause:
-                Time.timeScale = 1;
-                pauseUI.enabled = false;
-                break;
+            Time.timeScale = 1;
+            pauseUI.enabled = false;
+            camAudioSource.UnPause();
         }
+        //switch (prevState)
+        //{
+        //    case MenuStates.Pause:
+        //        Time.timeScale = 1;
+        //        pauseUI.enabled = false;
+        //        break;
+        //}
     }
 
     public void setCurrState(MenuStates input)

@@ -39,6 +39,10 @@ public class ADMoveStone : MonoBehaviour
                 //apply the force only in the x plane
                 Vector3 movementDirection = new Vector3(-horizInput, 0f, 0f).normalized;
 
+                //currStone.transform.Rotate(Vector3.forward, horizInput * 3f * Time.deltaTime);
+                //rotate the camera in the opposite direction to prevent it moving with the stone
+                //currStone.transform.GetChild(0).transform.Rotate(Vector3.back, horizInput * 3f * Time.deltaTime);
+
                 currStoneRb.AddForce(movementDirection * movementModifier);
             } 
             else

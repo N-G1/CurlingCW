@@ -10,35 +10,35 @@ public class PlayStateManager : MonoBehaviour
     [SerializeField] private GameObject arrow;
     //despite the fact all other UI's are handled in the gsm, I think 
     //that the round ending fits more as part of the actual game loop
-    [SerializeField] private Canvas roundUI;
-    [SerializeField] private Canvas gameUI;
-    //TEMP IMPLEMENTATION
+    [SerializeField] private Canvas roundUI, gameUI;
     [SerializeField] private TextMeshProUGUI txtTemp;
+    [SerializeField] private AudioSource camAudio;
+    [SerializeField] private AudioClip sfxDisappointed, sfxApplause;
 
     //aiming = initial direction with arrow, directing = moving stone in play 
     public enum PlayStates { Directing, Aiming, EnemyTurn, RoundEnded }
     private PlayStates currPlayState;
     private PlayStates prevPlayState;
-    private GameLoop gl;
-
-    private MeshRenderer[] arrowMeshes;
-    public static PlayStateManager PSMInstance;
     
+    private MeshRenderer[] arrowMeshes;
+
+    public static PlayStateManager PSMInstance;
+    private GameStateManager gsm;
+    private GameLoop gl;
 
     private int roundPoints = 0, stonesUsed = 0;
     private int playerPoints, enemyPoints = 0;
     private string roundWinningTeam, winningTeam;
+    
     private bool incrementedPoints = false;
-    private GameStateManager gsm;
     private bool hasBeenSet = false;
     private bool stoneHasBeenIncremented = false;
-
+    private bool audioPlayed = false;
 
     //number of stones each team has each round 
-    public const int stoneLimit = 1;
+    public int stoneLimit;
     //number of ends 
-    private int ends = 2, endsPlayed = 0;
-
+    private int ends, endsPlayed = 0;
 
     //Singleton used same as GSM to access in other scripts, not sure if this is the most 
     //efficient way to do this but it works 
@@ -55,6 +55,10 @@ public class PlayStateManager : MonoBehaviour
 
         currPlayState = PlayStates.Aiming;
         winningTeam = "None";
+
+        stoneLimit = PlayerPrefs.GetInt("Stones");
+        ends = PlayerPrefs.GetInt("Ends");
+        camAudio.volume = PlayerPrefs.GetFloat("Volume");
     }
 
     void Start()
@@ -70,9 +74,7 @@ public class PlayStateManager : MonoBehaviour
         {
             case PlayStates.Aiming:
                 ChangeArrowVisibility(true);
-                incrementedPoints = false;
-                hasBeenSet = false;
-                stoneHasBeenIncremented = false;
+                resetFlags();
                 break;
             case PlayStates.Directing:
                 ChangeArrowVisibility(false);
@@ -85,23 +87,7 @@ public class PlayStateManager : MonoBehaviour
                 }
                 break;
             case PlayStates.RoundEnded:
-                //prevents setEndsPlayed being set more than once a round
-                IncrementScore();
-                if (!hasBeenSet)
-                {
-                    setEndsPlayed(getEndsPlayed() + 1);
-                    hasBeenSet = true;
-                }
-                if (getEndsPlayed() != ends)
-                {
-                    RoundEnded();
-                }
-                else
-                {
-                    ChangeArrowVisibility(false);
-                    gsm.setCurrState(GameStateManager.MenuStates.GameEnded);
-                    gsm.setPrevState(GameStateManager.MenuStates.Play);
-                }
+                handleRoundEnd();
                 break;
         }
     }
@@ -118,9 +104,8 @@ public class PlayStateManager : MonoBehaviour
         }
     }
 
-    void IncrementScore()
+    void incrementScore()
     {
-        //TEMP IMPLEMENTATION - maybe not temp actually 
         if (roundWinningTeam == "Player" && !incrementedPoints)
         {
             playerPoints += getRoundPoints();
@@ -131,23 +116,80 @@ public class PlayStateManager : MonoBehaviour
             enemyPoints += getRoundPoints();
             incrementedPoints = true;
         }
+        playSFX();
+    }
+    /// <summary>
+    /// Plays the relevant sound effect
+    /// </summary>
+     void playSFX()
+    {
+        if (!audioPlayed)
+        {
+            if (playerPoints > enemyPoints)
+            {
+                camAudio.PlayOneShot(sfxApplause);
+            }
+            else if (enemyPoints > playerPoints)
+            {
+                camAudio.PlayOneShot(sfxDisappointed);
+            }
+            audioPlayed = true;
+        }
     }
 
-    void RoundEnded()
+    /// <summary>
+    /// Handles what to do at the end of a round, including incrementing the 
+    /// appropriate teams score, and ending the game if neccessary 
+    /// </summary>
+    void handleRoundEnd()
+    {
+        //prevents setEndsPlayed being set more than once a round
+        incrementScore();
+        if (!hasBeenSet)
+        {
+            setEndsPlayed(getEndsPlayed() + 1);
+            hasBeenSet = true;
+        }
+        if (getEndsPlayed() != ends)
+        {
+            roundedEndedDisplay();
+        }
+        else
+        {
+            ChangeArrowVisibility(false);
+            gsm.setCurrState(GameStateManager.MenuStates.GameEnded);
+            gsm.setPrevState(GameStateManager.MenuStates.Play);
+        }
+    }
+
+    /// <summary>
+    /// Displays the correct summary at the end of a round
+    /// </summary>
+    void roundedEndedDisplay()
     {
         gameUI.enabled = false;
         roundUI.enabled = true;
+        string points = "";
 
         if (playerPoints != 0 || enemyPoints != 0)
         {
-            winningTeam = playerPoints > enemyPoints ? "Player" : "Enemy";
+            winningTeam = playerPoints > enemyPoints ? "Red Team" : "Blue Team";
+
+            //if either team has 1 point and it is the most points, then singular 'point', else multiple 'points'
+            points = playerPoints > enemyPoints && playerPoints == 1 ? "point" : enemyPoints > playerPoints && enemyPoints == 1 ? "point" : "points";
         }
-
-        txtTemp.text = string.Format("{0}: {1}", winningTeam, getRoundPoints());
-
-        IncrementScore();
         
-        //wait 3 seconds to view leaderboard then start new round 
+        if (playerPoints == 0 && enemyPoints == 0)
+        {
+            txtTemp.text = "No round winner as no points were scored!";
+            
+        }
+        else
+        {
+            txtTemp.text = string.Format("Round winner is {0}! with {1} {2}", winningTeam, getRoundPoints(), points);
+        }
+        
+        //wait 3 seconds to view rounded ended screen then start new round 
         StartCoroutine(NewRound());
     }
 
@@ -185,6 +227,17 @@ public class PlayStateManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Resets all boolean flags used during play to prevent certain lines and
+    /// functions being ran more than once per state
+    /// </summary>
+    void resetFlags()
+    {
+        incrementedPoints = false;
+        hasBeenSet = false;
+        stoneHasBeenIncremented = false;
+        audioPlayed = false;
+    }
 
     //Getters and setters below, not implemented via { get; set } as used in other scripts 
     public void setPlayState(PlayStates input)

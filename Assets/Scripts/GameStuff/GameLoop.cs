@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 
 //Handles moving the stone in the direction selected
@@ -13,6 +14,10 @@ public class GameLoop : MonoBehaviour
     [SerializeField] private Transform pivot;
     [SerializeField] private Transform cameraPos;
     [SerializeField] private Transform target;
+
+    [SerializeField] private TextMeshProUGUI txtTurn;
+
+    [SerializeField] private AudioSource camAudioSource;
 
 
     private Camera mainCam;
@@ -60,12 +65,25 @@ public class GameLoop : MonoBehaviour
         stoneRb = stone.GetComponent<Rigidbody>();
     }
 
+    /// <summary>
+    /// Update function plays the stone moving effect, checks if the game has ended
+    /// and determines what to do based on which team is in play 
+    /// </summary>
     void Update()
     {
         ended = CheckGameEnded();
+        
+        //why does this work, surely the equality should be the other way around
+        if (stoneRb.velocity.magnitude < 0.03f)
+        {
+            camAudioSource.loop = true;
+            camAudioSource.Play();
+        }
 
         if (!ended)
         {
+            txtTurn.text = teamInPlay == 1 ? "Red Team's turn" : "Blue Team's turn";
+
             if (psm.getPlayState() != PlayStateManager.PlayStates.EnemyTurn && teamInPlay == 1 && gsm.getCurrState() != GameStateManager.MenuStates.Pause)
             {
                 enemyFired = false;
@@ -81,7 +99,7 @@ public class GameLoop : MonoBehaviour
                     velocityCheck();
                 }          
             }  
-        } 
+        }
     }
 
     //apply slide modifier
@@ -116,6 +134,8 @@ public class GameLoop : MonoBehaviour
         if (stoneRb.velocity.magnitude < 0.03f && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
         {
             timeUnderVelocity += Time.deltaTime;
+
+            camAudioSource.Stop();
             //check for if velocity has been under 0.03f for more than 0.5 seconds,
             //prevents instantly changing stone if it briefly stops 
             if (timeUnderVelocity > velocityTimeLimit)
@@ -158,7 +178,7 @@ public class GameLoop : MonoBehaviour
     private bool CheckGameEnded()
     {
         //Check when movement has stopped on the final stone of a round
-        if (psm.getStonesUsed() == PlayStateManager.stoneLimit && teamInPlay == 1 && moving == false)
+        if (psm.getStonesUsed() == psm.stoneLimit && teamInPlay == 1 && moving == false)
         {
             psm.setPlayState(PlayStateManager.PlayStates.RoundEnded);
             psm.setPrevPlayState(PlayStateManager.PlayStates.Directing);
@@ -186,7 +206,7 @@ public class GameLoop : MonoBehaviour
     private IEnumerator AIAimingDecision()
     {
         //flag to ensure only 1 coroutine is running
-        if (!enemyActive)
+        if (!enemyActive && gsm.getCurrState() != GameStateManager.MenuStates.Pause)
         {
             enemyActive = true;
             float firingChance = 0f;
@@ -225,21 +245,13 @@ public class GameLoop : MonoBehaviour
         bool stoneMoved = false;
         while (moving)
         {
-            //Research on how I can determine whether or not the stone is on the left or right of the 
-            //target lead me to this method, if targetRelativePos.x < 0 its on the left, and vice versa.
-            //Vector3 targetRelativePos = pivot.transform.InverseTransformPoint(stone.transform.position);
+            //Get the x cords of both the stone and the target
+            Vector3 stoneXCoords = new Vector3(stone.transform.position.x, 0f, 0f);
+            Vector3 targetXCoords = new Vector3(target.position.x, 0f, 0f);
 
-            Vector3 stoneXYCoords = new Vector3(stone.transform.position.x, stone.transform.position.y, 0f);
-            Vector3 targetXYCoords = new Vector3(target.position.x, target.position.y, 0f);
-            //float angle = Vector3.Angle(stone.transform.forward, stone.transform.position - target.position);
-
-            //Works out the distance between the stone and target in the XY plane, used below to check 
+            //Works out the distance between the stone and target in the X plane, used below to check 
             //if it is outside of bounds for curling
-            float distanceFromZ = Vector3.Distance(stoneXYCoords, targetXYCoords);
-            //Debug.Log("Distance along -z axis: " + distanceFromZ);
-
-            //angle between stone and target, will increase while getting further away
-            Vector3 direction = stone.transform.position - target.position;
+            float distanceInX = Vector3.Distance(stoneXCoords, targetXCoords);
 
             string sideOfTarget;
 
@@ -261,15 +273,13 @@ public class GameLoop : MonoBehaviour
                 stoneMoved = false;
             }
 
-            //stoneRb.AddForce(direction * 1.3f);
             stoneMoved = true;
-            if (distanceFromZ > 0.4f)
+
+            //if stone is not on course, allow AI to curl
+            if (distanceInX > 0.4f)
             {
                 AICurling(sideOfTarget);
             }
-            
-           // Debug.Log("direction vector is " + direction);
-
         }
     }
 

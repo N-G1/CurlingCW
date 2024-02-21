@@ -92,8 +92,9 @@ public class PointCheck : MonoBehaviour
     //custom comparator as mentioned above 
     int CmpDist(GameObject stone1, GameObject stone2)
     {
-        float dist1 = Vector3.Distance(stone1.transform.position, centre.position);
-        float dist2 = Vector3.Distance(stone2.transform.position, centre.position);
+        //temporary fix for before changing physics
+        float dist1 = Vector3.Distance(stone1.transform.GetChild(1).position, centre.position);
+        float dist2 = Vector3.Distance(stone2.transform.GetChild(1).position, centre.position);
 
         if (dist1 < dist2)
         {

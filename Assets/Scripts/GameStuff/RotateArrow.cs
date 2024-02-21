@@ -23,7 +23,22 @@ public class RotateArrow : MonoBehaviour
         else if (psm.getPlayState() == PlayStateManager.PlayStates.EnemyTurn)
         {
             float rotation = Mathf.PingPong(Time.time * 0.85f, 1f);
-            float rotationWindow = Mathf.Lerp(-30, 30, rotation);
+            float rotationWindow = 0f;
+
+            //higher difficulty = tighter potential slide angle
+            switch (PlayerPrefs.GetInt("AIDifficulty"))
+            {
+                case (1):
+                    rotationWindow = Mathf.Lerp(-45, 45, rotation);
+                    break;
+                case (2):
+                    rotationWindow = Mathf.Lerp(-25, 25, rotation);
+                    break;
+                case (3):
+                    rotationWindow = Mathf.Lerp(-10, 10, rotation);
+                    break;
+            }
+                
             transform.rotation = Quaternion.Euler(0f, rotationWindow, 0f);
         }
     }
