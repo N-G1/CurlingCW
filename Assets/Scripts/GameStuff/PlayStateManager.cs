@@ -143,7 +143,7 @@ public class PlayStateManager : MonoBehaviour
             winningTeam = playerPoints > enemyPoints ? "Player" : "Enemy";
         }
 
-        txtTemp.text = string.Format("{0}: {1}", winningTeam, playerPoints);
+        txtTemp.text = string.Format("{0}: {1}", winningTeam, getRoundPoints());
 
         IncrementScore();
         

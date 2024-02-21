@@ -23,7 +23,7 @@ public class RotateArrow : MonoBehaviour
         else if (psm.getPlayState() == PlayStateManager.PlayStates.EnemyTurn)
         {
             float rotation = Mathf.PingPong(Time.time * 0.85f, 1f);
-            float rotationWindow = Mathf.Lerp(-15, 15, rotation);
+            float rotationWindow = Mathf.Lerp(-30, 30, rotation);
             transform.rotation = Quaternion.Euler(0f, rotationWindow, 0f);
         }
     }
