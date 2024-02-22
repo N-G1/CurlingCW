@@ -15,6 +15,8 @@ public class GameLoop : MonoBehaviour
     [SerializeField] private Transform cameraPos;
     [SerializeField] private Transform target;
 
+    [SerializeField] private Collider centralCollider;
+
     [SerializeField] private TextMeshProUGUI txtTurn;
 
     [SerializeField] private AudioSource camAudioSource;
@@ -209,6 +211,7 @@ public class GameLoop : MonoBehaviour
         if (!enemyActive && gsm.getCurrState() != GameStateManager.MenuStates.Pause)
         {
             enemyActive = true;
+            float maxAngle = 0;
             float firingChance = 0f;
 
             while (!enemyFired)
@@ -218,10 +221,24 @@ public class GameLoop : MonoBehaviour
                 float angle = Vector3.Angle(pivot.forward, pivot.position - target.position);
                 Debug.Log("Angle is " + angle);
 
+                maxAngle = PlayerPrefs.GetInt("AIDifficulty") == 1 ? 45 : 
+                             PlayerPrefs.GetInt("AIDifficulty") == 2 ? 25 : 18;
+
                 //Equation I trial and errored until I found something I liked
-                //nicely increases the chance as the angle approaches 0, however chance         e^(((-x+0.001) /60 * 1 - x * 0.0224f) where x <= 30 and x = angle
+                //nicely increases the chance as the angle approaches 0, however chance         e^(((-x+0.001) / maxAngle * 1 - x * 0.02f) where x <= 45/25/15 and x = angle
                 //got too high as it approached 0, so cut off at 80% chance to slide
-                firingChance = Mathf.Min(Mathf.Exp((-angle + 0.001f) / 30f * 1 - angle * 0.04f), 0.80f);
+                firingChance = Mathf.Min(Mathf.Exp((-angle + 0.001f) / maxAngle * 1 - angle * 0.02f), 0.80f);
+
+                //if there are any blocking stones, decrease the chance of the AI firing directly straight
+                if (CenterCollider.stonesInCenter.Count > 0 && angle <= 6)
+                {
+                    firingChance *= 0.5f;
+                }
+                //if the angle is still reasonable (but not straight) and there are blocking stones, increase chance to slide at these angles
+                else if (CenterCollider.stonesInCenter.Count > 0 && angle >= 6 && angle <= 20)
+                {
+                    firingChance += firingChance * 0.25f;
+                }
 
                 if (Random.Range(0f, 1.01f) < firingChance)
                 {

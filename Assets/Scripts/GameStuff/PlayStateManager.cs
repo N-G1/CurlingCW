@@ -176,7 +176,8 @@ public class PlayStateManager : MonoBehaviour
             winningTeam = playerPoints > enemyPoints ? "Red Team" : "Blue Team";
 
             //if either team has 1 point and it is the most points, then singular 'point', else multiple 'points'
-            points = playerPoints > enemyPoints && playerPoints == 1 ? "point" : enemyPoints > playerPoints && enemyPoints == 1 ? "point" : "points";
+            points = playerPoints > enemyPoints && playerPoints == 1 ? "point" : 
+                     enemyPoints > playerPoints && enemyPoints == 1 ? "point" : "points";
         }
         
         if (playerPoints == 0 && enemyPoints == 0)

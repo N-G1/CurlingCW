@@ -35,7 +35,7 @@ public class RotateArrow : MonoBehaviour
                     rotationWindow = Mathf.Lerp(-25, 25, rotation);
                     break;
                 case (3):
-                    rotationWindow = Mathf.Lerp(-10, 10, rotation);
+                    rotationWindow = Mathf.Lerp(-18, 18, rotation);
                     break;
             }
                 
