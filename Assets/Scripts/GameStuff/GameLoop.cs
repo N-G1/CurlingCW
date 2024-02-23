@@ -222,10 +222,10 @@ public class GameLoop : MonoBehaviour
                 Debug.Log("Angle is " + angle);
 
                 maxAngle = PlayerPrefs.GetInt("AIDifficulty") == 1 ? 45 : 
-                             PlayerPrefs.GetInt("AIDifficulty") == 2 ? 25 : 18;
+                           PlayerPrefs.GetInt("AIDifficulty") == 2 ? 25 : 18;
 
                 //Equation I trial and errored until I found something I liked
-                //nicely increases the chance as the angle approaches 0, however chance         e^(((-x+0.001) / maxAngle * 1 - x * 0.02f) where x <= 45/25/15 and x = angle
+                //nicely increases the chance as the angle approaches 0, however chance         e^((-x+0.001) / maxAngle * 1 - x * 0.02f) where x <= 45/25/15 and x = angle
                 //got too high as it approached 0, so cut off at 80% chance to slide
                 firingChance = Mathf.Min(Mathf.Exp((-angle + 0.001f) / maxAngle * 1 - angle * 0.02f), 0.80f);
 
