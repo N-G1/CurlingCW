@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-//script that attempts to emulate sliding on ice and the physics of the stones 
+/// <summary>
+/// script that attempts to emulate sliding on ice and the physics of the stones 
+/// used with AI stones as they use rb, only the player uses manual physics 
+/// </summary>
 public class StonePhysics : MonoBehaviour
 { 
     private Rigidbody rb;

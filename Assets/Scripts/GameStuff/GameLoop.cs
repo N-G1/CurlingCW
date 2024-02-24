@@ -14,13 +14,13 @@ public class GameLoop : MonoBehaviour
     [SerializeField] private Transform pivot;
     [SerializeField] private Transform cameraPos;
     [SerializeField] private Transform target;
-
-    [SerializeField] private Collider centralCollider;
+    
 
     [SerializeField] private TextMeshProUGUI txtTurn;
 
     [SerializeField] private AudioSource camAudioSource;
 
+    private Transform stoneCentre;
 
     private Camera mainCam;
     private GameObject stone;
@@ -36,7 +36,9 @@ public class GameLoop : MonoBehaviour
     private bool enemyFired = false, enemyActive = false;
 
     private const float slideModifier = 0.05f; //small modifier applied to simulate longer sliding
-    private const float velocityModifier = 13f; //initial force applied
+    private float velocityModifier = 13f; //initial force applied
+    private float currentSpeed = 0f;
+    private Vector3 currentVelocity;
 
     public static GameLoop GLInstance;
     private PlayStateManager psm;
@@ -63,6 +65,7 @@ public class GameLoop : MonoBehaviour
 
         psm = PlayStateManager.PSMInstance;
         gsm = GameStateManager.GSMInstance;
+
         stone = GameObject.FindGameObjectWithTag("CurrStone");
         stoneRb = stone.GetComponent<Rigidbody>();
     }
@@ -76,7 +79,7 @@ public class GameLoop : MonoBehaviour
         ended = CheckGameEnded();
         
         //why does this work, surely the equality should be the other way around
-        if (stoneRb.velocity.magnitude < 0.03f)
+        if ((currentSpeed < 0.9f && teamInPlay == 1) || (stoneRb.velocity.magnitude < 0.03f && teamInPlay == 2))
         {
             camAudioSource.loop = true;
             camAudioSource.Play();
@@ -123,7 +126,8 @@ public class GameLoop : MonoBehaviour
         {
             psm.setPlayState(PlayStateManager.PlayStates.Directing);
             psm.setPrevPlayState(PlayStateManager.PlayStates.Aiming);
-            handlePhysics();      
+            moving = true;
+            StartCoroutine(handlePhysics());      
         }
     }
 
@@ -133,7 +137,7 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     private void velocityCheck()
     {
-        if (stoneRb.velocity.magnitude < 0.03f && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
+        if (((currentSpeed < 0.9f && teamInPlay == 1) || (stoneRb.velocity.magnitude < 0.03f && teamInPlay == 2)) && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
         {
             timeUnderVelocity += Time.deltaTime;
 
@@ -192,8 +196,65 @@ public class GameLoop : MonoBehaviour
     /// <summary>
     /// Applies force to stone TODO:redo physics 
     /// </summary>
-    private void handlePhysics()
+    private IEnumerator handlePhysics()
     {
+        float timeControlling = 0f;
+        float timeLimit = 4f;
+        Vector3 nextPos = stone.transform.position, prevPos = stone.transform.position;
+        //pivot is facing backwards   
+        Vector3 direction = -pivot.forward;
+        velocityModifier = 13f;
+
+        while (moving && velocityModifier >= 0.85f)
+        {
+            //prefab is off centre, so instead rotate around child gameobject at centre of pivot 
+            stoneCentre = stone.transform.GetChild(1).transform;
+            timeControlling += Time.deltaTime;
+
+            //prevents the player from holding A and D and never moving to the next stone
+            if (timeControlling < timeLimit && (Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.D))))
+            {
+                float horizInput = Input.GetAxis("Horizontal");
+                //both below meant to simulate reducting in rotation/sweeping speed as stone slows down 
+                float rotModifier = currentSpeed < 2f ? 0.6f : currentSpeed < 4f ? 1f : 1.3f;
+                float sweepModifier = currentSpeed < 3f ? 1f : currentSpeed < 8f ? 2f : 3f;
+
+                //apply the force only in the x plane
+                Vector3 movDirection = new Vector3(-horizInput, 0f, 0f).normalized;
+                movDirection.x = direction.x;
+
+                //rotate the stone around the central gameobject, rotate camera in opposite direction so it stays stationary
+                stone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.deltaTime);
+                stone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.deltaTime);
+
+                prevPos = stone.transform.position;
+                nextPos = prevPos + movDirection * sweepModifier * Time.deltaTime;
+
+                //interpolates between previous direction and new direction, more realistic turning when switching from pivot direction
+                direction = Vector3.Slerp(direction, -stoneCentre.transform.forward, 0.01f);
+
+                //currStoneRb.AddForce(movDirection * movementModifier);
+            }
+            prevPos = stone.transform.position;
+            nextPos = prevPos + direction * velocityModifier * Time.deltaTime;
+
+            //workout speed for stone stopping and turning
+            currentSpeed = (nextPos - prevPos).magnitude / Time.deltaTime;
+            currentVelocity = (nextPos - prevPos) / Time.deltaTime;
+
+            stone.transform.position = nextPos;
+            //gradually decrease velocity
+            velocityModifier *= 0.9973f;
+            yield return null;    
+        }
+    }
+
+    /// <summary>
+    /// AI physics works with a ridgidbody instead of manual physics 
+    /// </summary>
+    private void handleAIPhysics()
+    {
+        velocityModifier = 13f;
         moving = true;
         //pivot is facing backwards
         Vector3 direction = -pivot.forward;
@@ -242,7 +303,7 @@ public class GameLoop : MonoBehaviour
 
                 if (Random.Range(0f, 1.01f) < firingChance)
                 {
-                    handlePhysics();
+                    handleAIPhysics();
                     enemyFired = true;
 
                     //set the states and manage directing once the enemy has selected an angle to slide 
@@ -326,5 +387,22 @@ public class GameLoop : MonoBehaviour
     public void setEnded(bool val)
     {
         ended = val;
+    }
+
+    public float getCurrSpeed()
+    {
+        return currentSpeed;
+    }
+    public void setCurrSpeed(float speed)
+    {
+        currentSpeed = speed;
+    }
+    public Vector3 getCurrVelocity()
+    {
+        return currentVelocity;
+    }
+    public void setCurrVelocity(Vector3 vec)
+    {
+        currentVelocity = vec;
     }
 }

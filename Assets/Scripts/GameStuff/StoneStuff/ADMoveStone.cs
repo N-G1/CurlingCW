@@ -5,6 +5,7 @@ using UnityEngine;
 public class ADMoveStone : MonoBehaviour
 {
     private PlayStateManager psm;
+    private GameLoop gl;
     private GameObject currStone;
     private Transform stoneCentre;
     private Rigidbody currStoneRb;
@@ -17,6 +18,7 @@ public class ADMoveStone : MonoBehaviour
     void Start()
     {
         psm = PlayStateManager.PSMInstance;
+        gl = GameLoop.GLInstance;
     }
 
     // Update is called once per frame
@@ -35,11 +37,12 @@ public class ADMoveStone : MonoBehaviour
             if (timeControlling < timeLimit && (Input.GetKey(KeyCode.A) || (Input.GetKey(KeyCode.D))))
             {
                 float horizInput = Input.GetAxis("Horizontal");
-                float magnitude = currStoneRb.velocity.magnitude; 
+                //float magnitude = currStoneRb.velocity.magnitude; 
+                //float magnitude = (gl.getNextPos() - gl.getPrevPos()).magnitude / Time.deltaTime;
 
                 //both below meant to simulate reducting in rotation/sweeping speed increase as stone slows down 
-                float rotModifier = magnitude < 2f ? 0.6f : magnitude < 4f ? 1f : 1.3f;
-                float movementModifier = magnitude < 3f ? 1.15f : magnitude < 8f ? 1.35f : 1.45f; 
+                //float rotModifier = magnitude < 2f ? 0.3f : magnitude < 4f ? 0.5f : 0.7f;
+                //float movementModifier = magnitude < 3f ? 1f : magnitude < 8f ? 2f : 3f; 
 
                 Vector3 movDirection;
 
@@ -50,10 +53,11 @@ public class ADMoveStone : MonoBehaviour
                 //stoneCentre.localRotation = Quaternion.Slerp(stoneCentre.localRotation, targetRotation, 10f * Time.deltaTime);
 
                 //rotate the stone around the central gameobject, rotate camera in opposite direction so it stays stationary
-                currStone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.deltaTime);
-                currStone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.deltaTime);
+                //currStone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.deltaTime);
+                //currStone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.deltaTime);
 
-                currStoneRb.AddForce(movDirection * movementModifier);
+                //currStoneRb.AddForce(movDirection * movementModifier);
+                //currStone.transform.position += movDirection * movementModifier * Time.deltaTime;
             } 
         }
         if (psm.getPlayState() == PlayStateManager.PlayStates.Aiming)

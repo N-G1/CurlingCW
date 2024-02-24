@@ -3015,7 +3015,7 @@ GameObject:
   - component: {fileID: 5648448286273715383}
   - component: {fileID: 2999606391022445206}
   - component: {fileID: 7582194035476531592}
-  - component: {fileID: 3165714366259378653}
+  - component: {fileID: 6440003390561395224}
   m_Layer: 8
   m_Name: PlayerStone
   m_TagString: CurrStone
@@ -3041,7 +3041,7 @@ Transform:
   - {fileID: 1935518920243994786}
   - {fileID: 8823923899131715434}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &248599020787892858
 MonoBehaviour:
@@ -4204,9 +4204,9 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 32
   m_CollisionDetection: 0
---- !u!114 &3165714366259378653
+--- !u!114 &6440003390561395224
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4215,7 +4215,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4407404494049575121}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1ab20037f6d4614b821c3d63340968c, type: 3}
+  m_Script: {fileID: 11500000, guid: 33054bb95e8974240a083631b1df5592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6863971402419512322
