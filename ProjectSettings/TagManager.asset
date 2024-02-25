@@ -9,6 +9,7 @@ TagManager:
   - CameraPos
   - CurrStone
   - Stone
+  - Wall
   layers:
   - Default
   - TransparentFX

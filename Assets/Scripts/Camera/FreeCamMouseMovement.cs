@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FreeCamMovement : MonoBehaviour
 {
-    //TODO only allow freecam to be accessed before stone has been pushed, prob use an enum for 'in play'/'not in play'
     private const float mouseSens = 50;
     private float xRotation = 0, yRotation = 0;
     [SerializeField] private Transform rbHolder;
@@ -22,7 +21,7 @@ public class FreeCamMovement : MonoBehaviour
         //gets vertical movement, stores in mouseY
         float mouseY = Input.GetAxisRaw("Mouse Y") * mouseSens * Time.deltaTime;
 
-        //collects mouse rotations, to the best of my understanding, rotations take place
+        //collects mouse rotations. To the best of my understanding, rotations take place
         //in the opposite plane, so for example rotating around x takes place in the y plane
         //(in a 2d example) hence why this code works how you would expect 
         yRotation += mouseX;

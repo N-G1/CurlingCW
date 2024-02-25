@@ -7,7 +7,6 @@ public class PointCheck : MonoBehaviour
 
     [SerializeField] private Transform centre;
 
-    //originally did [16]arr but easier with list 
     private List<GameObject> stonesInside = new List<GameObject>();
     private PlayStateManager psm;
 
@@ -48,7 +47,7 @@ public class PointCheck : MonoBehaviour
     {
         if (collision.gameObject.tag == "Stone" || collision.gameObject.tag == "CurrStone")
         {
-            stonesInside.Add(collision.gameObject);
+            stonesInside.Add(collision.gameObject);      
         }
     }
 
@@ -89,6 +88,7 @@ public class PointCheck : MonoBehaviour
         closestTeam = prevLayer == 8 ? "Player" : "Opponent";
         return pointsAwarded;
     }
+
     //custom comparator as mentioned above 
     int CmpDist(GameObject stone1, GameObject stone2)
     {

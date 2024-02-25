@@ -34,6 +34,7 @@ public class GameLoop : MonoBehaviour
     private bool moving = false;
     private bool ended = false;
     private bool enemyFired = false, enemyActive = false;
+    private bool bouncedOffWall = false;
 
     private const float slideModifier = 0.05f; //small modifier applied to simulate longer sliding
     private float velocityModifier = 13f; //initial force applied
@@ -67,7 +68,7 @@ public class GameLoop : MonoBehaviour
         gsm = GameStateManager.GSMInstance;
 
         stone = GameObject.FindGameObjectWithTag("CurrStone");
-        stoneRb = stone.GetComponent<Rigidbody>();
+        //stoneRb = stone.GetComponent<Rigidbody>();
     }
 
     /// <summary>
@@ -78,8 +79,8 @@ public class GameLoop : MonoBehaviour
     {
         ended = CheckGameEnded();
         
-        //why does this work, surely the equality should be the other way around
-        if ((currentSpeed < 0.9f && teamInPlay == 1) || (stoneRb.velocity.magnitude < 0.03f && teamInPlay == 2))
+        //enables audio
+        if ((currentSpeed < 0.25f && teamInPlay == 1) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f))
         {
             camAudioSource.loop = true;
             camAudioSource.Play();
@@ -110,7 +111,7 @@ public class GameLoop : MonoBehaviour
     //apply slide modifier
     void FixedUpdate()
     {
-        if (moving)
+        if (moving && teamInPlay == 2)
         {
             stoneRb.AddForce(-transform.forward * slideModifier, ForceMode.Impulse);
         }
@@ -137,7 +138,8 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     private void velocityCheck()
     {
-        if (((currentSpeed < 0.9f && teamInPlay == 1) || (stoneRb.velocity.magnitude < 0.03f && teamInPlay == 2)) && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
+        //checks the current speed if player (as no rb), checks rb if enemy 
+        if (((currentSpeed < 0.25f && teamInPlay == 1 && bouncedOffWall == false) || (currentSpeed < 0.01f && teamInPlay == 1 && bouncedOffWall == true) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f)) && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
         {
             timeUnderVelocity += Time.deltaTime;
 
@@ -147,6 +149,7 @@ public class GameLoop : MonoBehaviour
             if (timeUnderVelocity > velocityTimeLimit)
             {
                 moving = false;
+                bouncedOffWall = false;
                 stone.tag = "Stone";
 
                 //For reference below: Aiming -> Directing -> EnemyTurn -> Directing -> Aiming -> ....
@@ -155,7 +158,8 @@ public class GameLoop : MonoBehaviour
                 if (psm.getPrevPlayState() == PlayStateManager.PlayStates.Aiming || psm.getPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
                 {
                     stone = Instantiate(stonePrefabs[1], stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
-                    psm.setPlayState(PlayStateManager.PlayStates.EnemyTurn); 
+                    psm.setPlayState(PlayStateManager.PlayStates.EnemyTurn);
+                    stoneRb = stone.GetComponent<Rigidbody>();
                     teamInPlay = 2;
                 }
                 //if youve just come from enemy turn then its other teams turn directing
@@ -166,12 +170,12 @@ public class GameLoop : MonoBehaviour
                     teamInPlay = 1;
                 }
                 
-                stone.tag = "CurrStone";
-                stoneRb = stone.GetComponent<Rigidbody>();
+                stone.tag = "CurrStone"; 
+                
 
                 mainCam.transform.position = stone.transform.GetChild(0).position;
+                //mainCam.transform.rotation = Quaternion.Euler(mainCam.transform.rotation.x, 0f, mainCam.transform.rotation.z);
                 mainCam.transform.parent = stone.transform.GetChild(0);
-
                 timeUnderVelocity = 0f;
             }   
         }
@@ -194,18 +198,20 @@ public class GameLoop : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies force to stone TODO:redo physics 
+    /// Applies force to stone 
+    /// Attempted this without coroutine but resulted in choppy movement
     /// </summary>
     private IEnumerator handlePhysics()
     {
         float timeControlling = 0f;
-        float timeLimit = 4f;
-        Vector3 nextPos = stone.transform.position, prevPos = stone.transform.position;
+        float timeLimit = 5f;
+        Vector3 nextPos, prevPos;
         //pivot is facing backwards   
         Vector3 direction = -pivot.forward;
-        velocityModifier = 13f;
+        velocityModifier = 3.75f;
+        bool sweepedThisFrame = false;
 
-        while (moving && velocityModifier >= 0.85f)
+        while (moving && velocityModifier >= 0.05f && !bouncedOffWall)
         {
             //prefab is off centre, so instead rotate around child gameobject at centre of pivot 
             stoneCentre = stone.transform.GetChild(1).transform;
@@ -216,45 +222,50 @@ public class GameLoop : MonoBehaviour
             {
                 float horizInput = Input.GetAxis("Horizontal");
                 //both below meant to simulate reducting in rotation/sweeping speed as stone slows down 
-                float rotModifier = currentSpeed < 2f ? 0.6f : currentSpeed < 4f ? 1f : 1.3f;
-                float sweepModifier = currentSpeed < 3f ? 1f : currentSpeed < 8f ? 2f : 3f;
+                float rotModifier = currentSpeed < 0.75f ? 0.3f : currentSpeed < 2f ? 0.5f : 0.7f;
 
                 //apply the force only in the x plane
                 Vector3 movDirection = new Vector3(-horizInput, 0f, 0f).normalized;
                 movDirection.x = direction.x;
 
                 //rotate the stone around the central gameobject, rotate camera in opposite direction so it stays stationary
-                stone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.deltaTime);
-                stone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.deltaTime);
+                stone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.fixedDeltaTime);
+                stone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.fixedDeltaTime);
 
-                prevPos = stone.transform.position;
-                nextPos = prevPos + movDirection * sweepModifier * Time.deltaTime;
+                sweepedThisFrame = true;
 
                 //interpolates between previous direction and new direction, more realistic turning when switching from pivot direction
                 direction = Vector3.Slerp(direction, -stoneCentre.transform.forward, 0.01f);
-
-                //currStoneRb.AddForce(movDirection * movementModifier);
             }
             prevPos = stone.transform.position;
-            nextPos = prevPos + direction * velocityModifier * Time.deltaTime;
+            if (sweepedThisFrame)
+            {
+                nextPos = prevPos + direction * (velocityModifier + velocityModifier * 0.1f) * Time.fixedDeltaTime;
+                sweepedThisFrame = false;
+            }
+            else
+            {
+                nextPos = prevPos + direction * velocityModifier * Time.fixedDeltaTime;
+            }
+            
+            //workout speed for stone stopping and turning, velocity used in wall collision 
+            currentVelocity = (nextPos - prevPos) / Time.fixedDeltaTime;
+            currentSpeed = currentVelocity.magnitude;
 
-            //workout speed for stone stopping and turning
-            currentSpeed = (nextPos - prevPos).magnitude / Time.deltaTime;
-            currentVelocity = (nextPos - prevPos) / Time.deltaTime;
-
+            //gradually decrease velocity and set new position
             stone.transform.position = nextPos;
-            //gradually decrease velocity
-            velocityModifier *= 0.9973f;
+            velocityModifier *= 0.9966f;
+ 
             yield return null;    
         }
     }
 
     /// <summary>
-    /// AI physics works with a ridgidbody instead of manual physics 
+    /// Applies single initial launch velocity to AI stone 
     /// </summary>
     private void handleAIPhysics()
     {
-        velocityModifier = 13f;
+        velocityModifier = 13;
         moving = true;
         //pivot is facing backwards
         Vector3 direction = -pivot.forward;
@@ -272,8 +283,8 @@ public class GameLoop : MonoBehaviour
         if (!enemyActive && gsm.getCurrState() != GameStateManager.MenuStates.Pause)
         {
             enemyActive = true;
-            float maxAngle = 0;
-            float firingChance = 0f;
+            float maxAngle;
+            float firingChance;
 
             while (!enemyFired)
             {
@@ -286,7 +297,7 @@ public class GameLoop : MonoBehaviour
                            PlayerPrefs.GetInt("AIDifficulty") == 2 ? 25 : 18;
 
                 //Equation I trial and errored until I found something I liked
-                //nicely increases the chance as the angle approaches 0, however chance         e^((-x+0.001) / maxAngle * 1 - x * 0.02f) where x <= 45/25/15 and x = angle
+                //nicely increases the chance as the angle approaches 0, however chance         e^((-x+0.001) / maxAngle * 1 - x * 0.02f) where x <= 45/25/18 and x = maxAngle
                 //got too high as it approached 0, so cut off at 80% chance to slide
                 firingChance = Mathf.Min(Mathf.Exp((-angle + 0.001f) / maxAngle * 1 - angle * 0.02f), 0.80f);
 
@@ -320,7 +331,6 @@ public class GameLoop : MonoBehaviour
     /// </summary>
     private IEnumerator AIDirectingDecisions()
     {
-        bool stoneMoved = false;
         while (moving)
         {
             //Get the x cords of both the stone and the target
@@ -344,14 +354,9 @@ public class GameLoop : MonoBehaviour
                 sideOfTarget = "left";
             }
 
-            //prevents the stone from constantly being moved
-            if (stoneMoved)
-            {
-                yield return new WaitForSeconds(0.05f);
-                stoneMoved = false;
-            }
+            //brief pause to prevent constant movement 
+            yield return new WaitForSeconds(0.05f);
 
-            stoneMoved = true;
 
             //if stone is not on course, allow AI to curl
             if (distanceInX > 0.4f)
@@ -404,5 +409,10 @@ public class GameLoop : MonoBehaviour
     public void setCurrVelocity(Vector3 vec)
     {
         currentVelocity = vec;
+    }
+
+    public void setBouncedOffWall(bool val)
+    {
+        bouncedOffWall = val;
     }
 }

@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class MainCameraMovement : MonoBehaviour
 {
-    // Start is called before the first frame update
+    //TODO move these two lines into another script
     void Start()
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
-
-    // Update is called once per frame
     void Update()
     {
         

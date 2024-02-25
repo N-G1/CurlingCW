@@ -3012,10 +3012,9 @@ GameObject:
   - component: {fileID: 248599020787892858}
   - component: {fileID: 2142507785336292546}
   - component: {fileID: 5786875181670973078}
-  - component: {fileID: 5648448286273715383}
   - component: {fileID: 2999606391022445206}
-  - component: {fileID: 7582194035476531592}
   - component: {fileID: 6440003390561395224}
+  - component: {fileID: 4891268036035317264}
   m_Layer: 8
   m_Name: PlayerStone
   m_TagString: CurrStone
@@ -4149,14 +4148,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &5648448286273715383
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4407404494049575121}
-  m_Mesh: {fileID: 0}
 --- !u!64 &2999606391022445206
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -4179,33 +4170,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!54 &7582194035476531592
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4407404494049575121}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 32
-  m_CollisionDetection: 0
 --- !u!114 &6440003390561395224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4218,6 +4182,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33054bb95e8974240a083631b1df5592, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 256
+--- !u!33 &4891268036035317264
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4407404494049575121}
+  m_Mesh: {fileID: 0}
 --- !u!1 &6863971402419512322
 GameObject:
   m_ObjectHideFlags: 0
@@ -4242,7 +4217,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6863971402419512322}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.482, y: 0.2480244, z: 0.454}
+  m_LocalPosition: {x: -0.512, y: 0.084, z: 0.454}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

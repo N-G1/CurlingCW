@@ -8,7 +8,6 @@ public class RotateArrow : MonoBehaviour
     }
     void Update()
     {
-        //pause the movement of the arrow once it has been fired so it doesnt continue to follow its direction
         if (psm.getPlayState() == PlayStateManager.PlayStates.Aiming)
         {
             //allows for the consitent back and fourth motion, once time.time * 0.85f > 1, resets back to 0 and so on 

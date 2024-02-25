@@ -28,7 +28,7 @@ public class FreeCamControl : MonoBehaviour
         //otherwise wasd will always travel in the same direction regardless of where you are looking
         movDirection = camOrientation.forward * vertInput + camOrientation.right * horizInput;
         
-        //don't like dealing with rb's because of the choppy camera problems they can cause so lerp in an attempt to smooth
+        //cameras on rbs can be choppy so lerp to somewhat smooth movement out 
         rb.velocity = Vector3.Lerp(rb.velocity, movDirection.normalized * 10f, Time.fixedDeltaTime * 5f);
     }
 }
