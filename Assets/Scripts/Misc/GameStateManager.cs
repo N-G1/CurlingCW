@@ -90,7 +90,6 @@ public class GameStateManager : MonoBehaviour
         pauseUI.enabled = true;
         gameUI.enabled = false;
         camAudioSource.Pause();
-        Time.timeScale = 0;
     }
 
     private void Play()
@@ -120,7 +119,6 @@ public class GameStateManager : MonoBehaviour
     {
         if (getPrevState() == MenuStates.Pause)
         {
-            Time.timeScale = 1;
             pauseUI.enabled = false;
             camAudioSource.UnPause();
         }

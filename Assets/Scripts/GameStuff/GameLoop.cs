@@ -80,7 +80,7 @@ public class GameLoop : MonoBehaviour
         ended = CheckGameEnded();
         
         //enables audio
-        if ((currentSpeed < 0.25f && teamInPlay == 1) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f))
+        if ((currentSpeed < 0.6f && teamInPlay == 1) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f))
         {
             camAudioSource.loop = true;
             camAudioSource.Play();
@@ -139,7 +139,7 @@ public class GameLoop : MonoBehaviour
     private void velocityCheck()
     {
         //checks the current speed if player (as no rb), checks rb if enemy 
-        if (((currentSpeed < 0.25f && teamInPlay == 1 && bouncedOffWall == false) || (currentSpeed < 0.01f && teamInPlay == 1 && bouncedOffWall == true) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f)) && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
+        if (((currentSpeed < 0.6f && teamInPlay == 1 && bouncedOffWall == false) || (currentSpeed < 0.01f && teamInPlay == 1 && bouncedOffWall == true) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f)) && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
         {
             timeUnderVelocity += Time.deltaTime;
 
@@ -204,14 +204,14 @@ public class GameLoop : MonoBehaviour
     private IEnumerator handlePhysics()
     {
         float timeControlling = 0f;
-        float timeLimit = 5f;
+        float timeLimit = 6f;
         Vector3 nextPos, prevPos;
         //pivot is facing backwards   
         Vector3 direction = -pivot.forward;
-        velocityModifier = 3.75f;
+        velocityModifier = 8.25f; //3.75
         bool sweepedThisFrame = false;
 
-        while (moving && velocityModifier >= 0.05f && !bouncedOffWall)
+        while (moving && velocityModifier >= 0.25f && !bouncedOffWall)
         {
             //prefab is off centre, so instead rotate around child gameobject at centre of pivot 
             stoneCentre = stone.transform.GetChild(1).transform;
@@ -222,7 +222,7 @@ public class GameLoop : MonoBehaviour
             {
                 float horizInput = Input.GetAxis("Horizontal");
                 //both below meant to simulate reducting in rotation/sweeping speed as stone slows down 
-                float rotModifier = currentSpeed < 0.75f ? 0.3f : currentSpeed < 2f ? 0.5f : 0.7f;
+                float rotModifier = currentSpeed < 1.75f ? 0.7f : currentSpeed < 4f ? 1f : 1.25f;
 
                 //apply the force only in the x plane
                 Vector3 movDirection = new Vector3(-horizInput, 0f, 0f).normalized;
@@ -247,16 +247,16 @@ public class GameLoop : MonoBehaviour
             {
                 nextPos = prevPos + direction * velocityModifier * Time.fixedDeltaTime;
             }
-            
+
             //workout speed for stone stopping and turning, velocity used in wall collision 
             currentVelocity = (nextPos - prevPos) / Time.fixedDeltaTime;
             currentSpeed = currentVelocity.magnitude;
 
             //gradually decrease velocity and set new position
             stone.transform.position = nextPos;
-            velocityModifier *= 0.9966f;
- 
-            yield return null;    
+            velocityModifier *= 0.9925f; //  0.9966f
+
+            yield return null;
         }
     }
 
@@ -406,11 +406,6 @@ public class GameLoop : MonoBehaviour
     {
         return currentVelocity;
     }
-    public void setCurrVelocity(Vector3 vec)
-    {
-        currentVelocity = vec;
-    }
-
     public void setBouncedOffWall(bool val)
     {
         bouncedOffWall = val;

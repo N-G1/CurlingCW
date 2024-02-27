@@ -16,6 +16,11 @@ public class MenuScript : MonoBehaviour
             PlayerPrefs.SetFloat("Volume", 0.10f);
         }
     }
+
+    private void Update()
+    {
+        Application.targetFrameRate = 60;
+    }
     public void btnPlay()
     {
         SceneManager.LoadScene(1, LoadSceneMode.Single);
