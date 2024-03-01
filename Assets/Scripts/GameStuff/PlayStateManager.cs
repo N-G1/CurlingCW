@@ -74,7 +74,7 @@ public class PlayStateManager : MonoBehaviour
         {
             case PlayStates.Aiming:
                 ChangeArrowVisibility(true);
-                resetFlags();
+                ResetFlags();
                 break;
             case PlayStates.Directing:
                 ChangeArrowVisibility(false);
@@ -82,12 +82,12 @@ public class PlayStateManager : MonoBehaviour
             case PlayStates.EnemyTurn:
                 if (!stoneHasBeenIncremented)
                 {
-                    setStonesUsed(getStonesUsed() + 1);
+                    SetStonesUsed(GetStonesUsed() + 1);
                     stoneHasBeenIncremented = true;
                 }
                 break;
             case PlayStates.RoundEnded:
-                handleRoundEnd();
+                HandleRoundEnd();
                 break;
         }
     }
@@ -104,24 +104,24 @@ public class PlayStateManager : MonoBehaviour
         }
     }
 
-    void incrementScore()
+    void IncrementScore()
     {
         if (roundWinningTeam == "Player" && !incrementedPoints)
         {
-            playerPoints += getRoundPoints();
+            playerPoints += GetRoundPoints();
             incrementedPoints = true;
         }
         else if (!incrementedPoints)
         {
-            enemyPoints += getRoundPoints();
+            enemyPoints += GetRoundPoints();
             incrementedPoints = true;
         }
-        playSFX();
+        PlaySFX();
     }
     /// <summary>
     /// Plays the relevant sound effect
     /// </summary>
-     void playSFX()
+     void PlaySFX()
     {
         if (!audioPlayed)
         {
@@ -141,31 +141,31 @@ public class PlayStateManager : MonoBehaviour
     /// Handles what to do at the end of a round, including incrementing the 
     /// appropriate teams score, and ending the game if neccessary 
     /// </summary>
-    void handleRoundEnd()
+    void HandleRoundEnd()
     {
         //prevents setEndsPlayed being set more than once a round
-        incrementScore();
+        IncrementScore();
         if (!hasBeenSet)
         {
-            setEndsPlayed(getEndsPlayed() + 1);
+            SetEndsPlayed(GetEndsPlayed() + 1);
             hasBeenSet = true;
         }
-        if (getEndsPlayed() != ends)
+        if (GetEndsPlayed() != ends)
         {
-            roundedEndedDisplay();
+            RoundedEndedDisplay();
         }
         else
         {
             ChangeArrowVisibility(false);
-            gsm.setCurrState(GameStateManager.MenuStates.GameEnded);
-            gsm.setPrevState(GameStateManager.MenuStates.Play);
+            gsm.SetCurrState(GameStateManager.MenuStates.GameEnded);
+            gsm.SetPrevState(GameStateManager.MenuStates.Play);
         }
     }
 
     /// <summary>
     /// Displays the correct summary at the end of a round
     /// </summary>
-    void roundedEndedDisplay()
+    void RoundedEndedDisplay()
     {
         gameUI.enabled = false;
         roundUI.enabled = true;
@@ -187,7 +187,7 @@ public class PlayStateManager : MonoBehaviour
         }
         else
         {
-            txtTemp.text = string.Format("Round winner is {0}! with {1} {2}", winningTeam, getRoundPoints(), points);
+            txtTemp.text = string.Format("Round winner is {0}! with {1} {2}", winningTeam, GetRoundPoints(), points);
         }
         
         //wait 3 seconds to view rounded ended screen then start new round 
@@ -199,21 +199,23 @@ public class PlayStateManager : MonoBehaviour
     /// </summary>
     IEnumerator NewRound()
     {
-        setPlayState(PlayStates.Aiming);
-        setPrevPlayState(PlayStates.RoundEnded);
-
-        yield return new WaitForSecondsRealtime(3);
+        SetPlayState(PlayStates.Aiming);
+        SetPrevPlayState(PlayStates.RoundEnded);
+        
+        yield return new WaitForSecondsRealtime(2);
 
         DestroyStones();
+
+        yield return new WaitForSecondsRealtime(1);
 
         gameUI.enabled = true;
         roundUI.enabled = false;
 
-        setRoundPoints(0);
-        setStonesUsed(0);
+        SetRoundPoints(0);
+        SetStonesUsed(0);
 
         //set gameEnded as false so gameloop can resume
-        gl.setEnded(false);
+        gl.SetEnded(false);
     }
 
     /// <summary>
@@ -232,7 +234,7 @@ public class PlayStateManager : MonoBehaviour
     /// Resets all boolean flags used during play to prevent certain lines and
     /// functions being ran more than once per state
     /// </summary>
-    void resetFlags()
+    void ResetFlags()
     {
         incrementedPoints = false;
         hasBeenSet = false;
@@ -241,61 +243,57 @@ public class PlayStateManager : MonoBehaviour
     }
 
     //Getters and setters below, not implemented via { get; set } as used in other scripts 
-    public void setPlayState(PlayStates input)
+    public void SetPlayState(PlayStates input)
     {
         currPlayState = input;
     }
-    public PlayStates getPlayState()
+    public PlayStates GetPlayState()
     {
         return currPlayState;
     }
 
-    public void setPrevPlayState(PlayStates input)
+    public void SetPrevPlayState(PlayStates input)
     {
         prevPlayState = input;
     }
-    public PlayStates getPrevPlayState()
+    public PlayStates GetPrevPlayState()
     {
         return prevPlayState;
     }
 
-    public void setRoundPoints(int input)
+    public void SetRoundPoints(int input)
     {
         roundPoints = input;
     }
-    public int getRoundPoints()
+    public int GetRoundPoints()
     {
         return roundPoints;
     }
-    public void setRoundWinnignTeam(string input)
+    public void SetRoundWinnignTeam(string input)
     {
         roundWinningTeam = input;
     }
-    public string getRoundWinningTeam()
-    {
-        return roundWinningTeam;
-    }
-    public void setStonesUsed(int input)
+    public void SetStonesUsed(int input)
     {
         stonesUsed = input;
     }
-    public int getStonesUsed()
+    public int GetStonesUsed()
     {
         return stonesUsed;
     }
-    public void setEndsPlayed(int input)
+    public void SetEndsPlayed(int input)
     {
         endsPlayed = input;
     }
-    public int getEndsPlayed()
+    public int GetEndsPlayed()
     {
         return endsPlayed;
     }
-    public int getPlayerPoints()
+    public int GetPlayerPoints()
     {
         return playerPoints;
     }
-    public int getEnemyPoints()
+    public int GetEnemyPoints()
     {
         return enemyPoints;
     }

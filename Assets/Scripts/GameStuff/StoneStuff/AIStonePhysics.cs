@@ -41,7 +41,7 @@ public class AIStonePhysics : MonoBehaviour
     /// <param name="collision">detected collision</param>
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Stone" && collision.gameObject.layer == 9)
+        if (collision.gameObject.CompareTag("Stone") && collision.gameObject.layer == 9)
         {
             Rigidbody otherStone = collision.gameObject.GetComponent<Rigidbody>();
             Vector3 direction = otherStone.transform.position - transform.position;

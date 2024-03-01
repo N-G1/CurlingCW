@@ -35,6 +35,7 @@ public class GameStateManager : MonoBehaviour
     void Start()
     {
         psm = PlayStateManager.PSMInstance;
+        Application.targetFrameRate = 60;
     }
 
     // Update is called once per frame
@@ -43,13 +44,13 @@ public class GameStateManager : MonoBehaviour
         //check if already paused and do different things depending 
         if (Input.GetKeyDown(KeyCode.Escape) && currState == MenuStates.Play)
         {
-            setCurrState(MenuStates.Pause);
+            SetCurrState(MenuStates.Pause);
             //Prev state only needs to be set when coming from game ended or paused
         }
         else if (Input.GetKeyDown(KeyCode.Escape) && currState == MenuStates.Pause)
         {
-            setCurrState(MenuStates.Play);
-            setPrevState(MenuStates.Pause);
+            SetCurrState(MenuStates.Play);
+            SetPrevState(MenuStates.Pause);
         }
 
         //enum for managing different states of play 
@@ -57,7 +58,7 @@ public class GameStateManager : MonoBehaviour
         {
             case MenuStates.MainMenu:
                 CursorUnlock();
-                mainMenu();
+                MainMenu();
                 break;
             case MenuStates.GameEnded:
                 CursorUnlock();
@@ -74,7 +75,7 @@ public class GameStateManager : MonoBehaviour
     }
 
 
-    private void mainMenu()
+    private void MainMenu()
     {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
@@ -82,7 +83,7 @@ public class GameStateManager : MonoBehaviour
     {
         gameEndedUI.enabled = true;
         gameUI.enabled = false;
-        txtFinalDisplay.text = string.Format("Player: {0}\nOpponent: {1}", psm.getPlayerPoints(), psm.getEnemyPoints());
+        txtFinalDisplay.text = string.Format("Player: {0}\nOpponent: {1}", psm.GetPlayerPoints(), psm.GetEnemyPoints());
     }
     private void PauseMenu()
     {
@@ -117,7 +118,7 @@ public class GameStateManager : MonoBehaviour
     //checks the previous screen and hides the relevant UI
     private void CheckPrevScreen()
     {
-        if (getPrevState() == MenuStates.Pause)
+        if (GetPrevState() == MenuStates.Pause)
         {
             pauseUI.enabled = false;
             camAudioSource.UnPause();
@@ -131,19 +132,19 @@ public class GameStateManager : MonoBehaviour
         //}
     }
 
-    public void setCurrState(MenuStates input)
+    public void SetCurrState(MenuStates input)
     {
         currState = input;
     }
-    public MenuStates getCurrState()
+    public MenuStates GetCurrState()
     {
         return currState;
     }
-    public void setPrevState(MenuStates input)
+    public void SetPrevState(MenuStates input)
     {
         prevState = input;
     }
-    public MenuStates getPrevState()
+    public MenuStates GetPrevState()
     {
         return prevState;
     }

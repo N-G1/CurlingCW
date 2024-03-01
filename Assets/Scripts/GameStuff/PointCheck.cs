@@ -22,21 +22,21 @@ public class PointCheck : MonoBehaviour
     {
         //when a round ends, check for the winning team and pass the vals to the psm for handling with 
         //game state changing 
-        if (psm.getPlayState() == PlayStateManager.PlayStates.RoundEnded && !alreadyChecked)
+        if (psm.GetPlayState() == PlayStateManager.PlayStates.RoundEnded && !alreadyChecked)
         {
             if (stonesInside.Count > 0)
             {
                 HandlePointCheck();
-                passValsToPSM(pointsAwarded, closestTeam);
+                PassValsToPSM(pointsAwarded, closestTeam);
             }
             else
             {
-                passValsToPSM(0, "None");
+                PassValsToPSM(0, "None");
             }
             alreadyChecked = true; 
         }
         //if has been round end, clear everything 
-        if (psm.getPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
+        if (psm.GetPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
         {
             alreadyChecked = false;
             pointsAwarded = 0;
@@ -45,7 +45,7 @@ public class PointCheck : MonoBehaviour
     }
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag == "Stone" || collision.gameObject.tag == "CurrStone")
+        if (collision.gameObject.CompareTag("Stone") || collision.gameObject.CompareTag("CurrStone"))
         {
             stonesInside.Add(collision.gameObject);      
         }
@@ -53,7 +53,7 @@ public class PointCheck : MonoBehaviour
 
     private void OnTriggerExit(Collider collision)
     {
-        if (collision.gameObject.tag == "Stone" || collision.gameObject.tag == "CurrStone")
+        if (collision.gameObject.CompareTag("Stone") || collision.gameObject.CompareTag("CurrStone"))
         {
             stonesInside.Remove(collision.gameObject);
         }
@@ -61,7 +61,7 @@ public class PointCheck : MonoBehaviour
 
 
     //had to do some research on how I could best implement this,
-    //concluded that a custom comparator would be best to order the list by 
+    //concluded that a simple custom comparator would be best to order the list by 
     //distance to the centre 
     int HandlePointCheck()
     {
@@ -115,9 +115,9 @@ public class PointCheck : MonoBehaviour
     /// </summary>
     /// <param name="points">points scored</param>
     /// <param name="team">team name</param>
-    void passValsToPSM(int points, string team)
+    void PassValsToPSM(int points, string team)
     {
-        psm.setRoundPoints(points);
-        psm.setRoundWinnignTeam(team);
+        psm.SetRoundPoints(points);
+        psm.SetRoundWinnignTeam(team);
     }
 }

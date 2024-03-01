@@ -8,7 +8,7 @@ public class CenterCollider : MonoBehaviour
     // Start is called before the first frame update
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag == "Stone" || collision.gameObject.tag == "CurrStone")
+        if (collision.gameObject.CompareTag("Stone") || collision.gameObject.CompareTag("CurrStone"))
         {
             stonesInCenter.Add(collision.gameObject);
         }
@@ -16,7 +16,7 @@ public class CenterCollider : MonoBehaviour
 
     private void OnTriggerExit(Collider collision)
     {
-        if (collision.gameObject.tag == "Stone" || collision.gameObject.tag == "CurrStone")
+        if (collision.gameObject.CompareTag("Stone") || collision.gameObject.CompareTag("CurrStone"))
         {
             stonesInCenter.Remove(collision.gameObject);
         }

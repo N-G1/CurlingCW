@@ -1,23 +1,21 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CrowdMovement : MonoBehaviour
 {
-
     [SerializeField] private LayerMask ignoredLayer;
 
-    //Simple crowd movement coroutine 
     void Start()
     {
         GameObject[] crowd = GameObject.FindGameObjectsWithTag("Crowd");
         foreach(GameObject crowdMember in crowd)
         {
-            StartCoroutine(moveCrowdMember(crowdMember, crowdMember.transform.position.y));
+            StartCoroutine(MoveCrowdMember(crowdMember));
         }
     }
 
-    IEnumerator moveCrowdMember(GameObject crowdMember, float height)
+    //Simple crowd movement coroutine, so they don't all jump in a uniform manner
+    IEnumerator MoveCrowdMember(GameObject crowdMember)
     {
         while (true)
         {

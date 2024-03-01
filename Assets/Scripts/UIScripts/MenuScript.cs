@@ -15,24 +15,20 @@ public class MenuScript : MonoBehaviour
             PlayerPrefs.SetInt("Stones", 4);
             PlayerPrefs.SetFloat("Volume", 0.10f);
         }
-    }
-
-    private void Update()
-    {
         Application.targetFrameRate = 60;
     }
-    public void btnPlay()
+    public void BtnPlay()
     {
         SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
-    public void btnOptions()
+    public void BtnOptions()
     {
         menu.enabled = false;
         options.enabled = true;
     }
 
-    public void btnQuit()
+    public void BtnQuit()
     {
         Application.Quit();
     }

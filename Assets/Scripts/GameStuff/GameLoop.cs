@@ -90,19 +90,19 @@ public class GameLoop : MonoBehaviour
         {
             txtTurn.text = teamInPlay == 1 ? "Red Team's turn" : "Blue Team's turn";
 
-            if (psm.getPlayState() != PlayStateManager.PlayStates.EnemyTurn && teamInPlay == 1 && gsm.getCurrState() != GameStateManager.MenuStates.Pause)
+            if (psm.GetPlayState() != PlayStateManager.PlayStates.EnemyTurn && teamInPlay == 1 && gsm.GetCurrState() != GameStateManager.MenuStates.Pause)
             {
                 enemyFired = false;
                 enemyActive = false;
-                moveStone();
-                velocityCheck();
+                MoveStone();
+                VelocityCheck();
             }
             else
             {
                 StartCoroutine(AIAimingDecision());
                 if (enemyFired)
                 {
-                    velocityCheck();
+                    VelocityCheck();
                 }          
             }  
         }
@@ -120,15 +120,15 @@ public class GameLoop : MonoBehaviour
     /// <summary>
     /// function that handles the player moving the stone
     /// </summary>
-    private void moveStone()
+    private void MoveStone()
     {
         //if user clicks and is aiming 
-        if (Input.GetMouseButtonDown(0) && psm.getPlayState() == PlayStateManager.PlayStates.Aiming && Camera.main == mainCam)
+        if (Input.GetMouseButtonDown(0) && psm.GetPlayState() == PlayStateManager.PlayStates.Aiming && Camera.main == mainCam)
         {
-            psm.setPlayState(PlayStateManager.PlayStates.Directing);
-            psm.setPrevPlayState(PlayStateManager.PlayStates.Aiming);
+            psm.SetPlayState(PlayStateManager.PlayStates.Directing);
+            psm.SetPrevPlayState(PlayStateManager.PlayStates.Aiming);
             moving = true;
-            StartCoroutine(handlePhysics());      
+            StartCoroutine(HandlePhysics());      
         }
     }
 
@@ -136,10 +136,10 @@ public class GameLoop : MonoBehaviour
     /// If stone velocity is almost none, spawn new stone and move over camera, 
     /// handles switching between players turn and opponent turn as well as the round ending
     /// </summary>
-    private void velocityCheck()
+    private void VelocityCheck()
     {
         //checks the current speed if player (as no rb), checks rb if enemy 
-        if (((currentSpeed < 0.6f && teamInPlay == 1 && bouncedOffWall == false) || (currentSpeed < 0.01f && teamInPlay == 1 && bouncedOffWall == true) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f)) && psm.getPlayState() == PlayStateManager.PlayStates.Directing)
+        if (((currentSpeed < 0.6f && teamInPlay == 1 && bouncedOffWall == false) || (currentSpeed < 0.01f && teamInPlay == 1 && bouncedOffWall == true) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f)) && psm.GetPlayState() == PlayStateManager.PlayStates.Directing)
         {
             timeUnderVelocity += Time.deltaTime;
 
@@ -155,18 +155,18 @@ public class GameLoop : MonoBehaviour
                 //For reference below: Aiming -> Directing -> EnemyTurn -> Directing -> Aiming -> ....
 
                 //if youve just come from aiming then its your turn directing 
-                if (psm.getPrevPlayState() == PlayStateManager.PlayStates.Aiming || psm.getPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
+                if (psm.GetPrevPlayState() == PlayStateManager.PlayStates.Aiming || psm.GetPrevPlayState() == PlayStateManager.PlayStates.RoundEnded)
                 {
                     stone = Instantiate(stonePrefabs[1], stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
-                    psm.setPlayState(PlayStateManager.PlayStates.EnemyTurn);
+                    psm.SetPlayState(PlayStateManager.PlayStates.EnemyTurn);
                     stoneRb = stone.GetComponent<Rigidbody>();
                     teamInPlay = 2;
                 }
                 //if youve just come from enemy turn then its other teams turn directing
-                else if (psm.getPrevPlayState() == PlayStateManager.PlayStates.EnemyTurn && psm.getPlayState() != PlayStateManager.PlayStates.RoundEnded)
+                else if (psm.GetPrevPlayState() == PlayStateManager.PlayStates.EnemyTurn && psm.GetPlayState() != PlayStateManager.PlayStates.RoundEnded)
                 {
                     stone = Instantiate(stonePrefabs[0], stoneSpawnPoint.transform.position, Quaternion.identity, stoneHolder.transform);
-                    psm.setPlayState(PlayStateManager.PlayStates.Aiming);
+                    psm.SetPlayState(PlayStateManager.PlayStates.Aiming);
                     teamInPlay = 1;
                 }
                 
@@ -188,10 +188,10 @@ public class GameLoop : MonoBehaviour
     private bool CheckGameEnded()
     {
         //Check when movement has stopped on the final stone of a round
-        if (psm.getStonesUsed() == psm.stoneLimit && teamInPlay == 1 && moving == false)
+        if (psm.GetStonesUsed() == psm.stoneLimit && teamInPlay == 1 && moving == false)
         {
-            psm.setPlayState(PlayStateManager.PlayStates.RoundEnded);
-            psm.setPrevPlayState(PlayStateManager.PlayStates.Directing);
+            psm.SetPlayState(PlayStateManager.PlayStates.RoundEnded);
+            psm.SetPrevPlayState(PlayStateManager.PlayStates.Directing);
             return true;
         }
         return false;
@@ -201,7 +201,7 @@ public class GameLoop : MonoBehaviour
     /// Applies force to stone 
     /// Attempted this without coroutine but resulted in choppy movement
     /// </summary>
-    private IEnumerator handlePhysics()
+    private IEnumerator HandlePhysics()
     {
         float timeControlling = 0f;
         float timeLimit = 6f;
@@ -231,7 +231,7 @@ public class GameLoop : MonoBehaviour
                 //rotate the stone around the central gameobject, rotate camera in opposite direction so it stays stationary
                 stone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.fixedDeltaTime);
                 stone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.fixedDeltaTime);
-
+                 
                 sweepedThisFrame = true;
 
                 //interpolates between previous direction and new direction, more realistic turning when switching from pivot direction
@@ -240,12 +240,12 @@ public class GameLoop : MonoBehaviour
             prevPos = stone.transform.position;
             if (sweepedThisFrame)
             {
-                nextPos = prevPos + direction * (velocityModifier + velocityModifier * 0.1f) * Time.fixedDeltaTime;
+                nextPos = prevPos + (velocityModifier + velocityModifier * 0.1f) * Time.fixedDeltaTime * direction;
                 sweepedThisFrame = false;
             }
             else
             {
-                nextPos = prevPos + direction * velocityModifier * Time.fixedDeltaTime;
+                nextPos = prevPos + Time.fixedDeltaTime * velocityModifier * direction;
             }
 
             //workout speed for stone stopping and turning, velocity used in wall collision 
@@ -263,7 +263,7 @@ public class GameLoop : MonoBehaviour
     /// <summary>
     /// Applies single initial launch velocity to AI stone 
     /// </summary>
-    private void handleAIPhysics()
+    private void HandleAIPhysics()
     {
         velocityModifier = 13;
         moving = true;
@@ -280,7 +280,7 @@ public class GameLoop : MonoBehaviour
     private IEnumerator AIAimingDecision()
     {
         //flag to ensure only 1 coroutine is running
-        if (!enemyActive && gsm.getCurrState() != GameStateManager.MenuStates.Pause)
+        if (!enemyActive && gsm.GetCurrState() != GameStateManager.MenuStates.Pause)
         {
             enemyActive = true;
             float maxAngle;
@@ -314,12 +314,12 @@ public class GameLoop : MonoBehaviour
 
                 if (Random.Range(0f, 1.01f) < firingChance)
                 {
-                    handleAIPhysics();
+                    HandleAIPhysics();
                     enemyFired = true;
 
                     //set the states and manage directing once the enemy has selected an angle to slide 
-                    psm.setPlayState(PlayStateManager.PlayStates.Directing);
-                    psm.setPrevPlayState(PlayStateManager.PlayStates.EnemyTurn);
+                    psm.SetPlayState(PlayStateManager.PlayStates.Directing);
+                    psm.SetPrevPlayState(PlayStateManager.PlayStates.EnemyTurn);
                     StartCoroutine(AIDirectingDecisions());
                 }
             }
@@ -377,36 +377,24 @@ public class GameLoop : MonoBehaviour
         Debug.Log("curled from: " + sideOfTarget );
     }
 
-    /// <summary>
-    /// Returns ended boolean
-    /// </summary>
-    /// <returns>ended</returns>
-    public bool getEnded()
-    {
-        return ended;
-    }
-    /// <summary>
-    /// Sets ended boolean
-    /// </summary>
-    /// <param name="val">boolean</param>
-    public void setEnded(bool val)
+    public void SetEnded(bool val)
     {
         ended = val;
     }
 
-    public float getCurrSpeed()
+    public float GetCurrSpeed()
     {
         return currentSpeed;
     }
-    public void setCurrSpeed(float speed)
+    public void SetCurrSpeed(float speed)
     {
         currentSpeed = speed;
     }
-    public Vector3 getCurrVelocity()
+    public Vector3 GetCurrVelocity()
     {
         return currentVelocity;
     }
-    public void setBouncedOffWall(bool val)
+    public void SetBouncedOffWall(bool val)
     {
         bouncedOffWall = val;
     }

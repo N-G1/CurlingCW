@@ -11,7 +11,7 @@ public class CollisionHandler : MonoBehaviour
     private GameLoop gl;
     private Rigidbody rb;
     private Vector3 originalPosition;
-    private bool collided = false, AIStone = false, bounced = false, wallNear = false;
+    private bool collided = false, AIStone = false, bounced = false;
 
     [SerializeField] LayerMask playerLayer, wallLayer, enemyLayer;
 
@@ -27,9 +27,9 @@ public class CollisionHandler : MonoBehaviour
     void Update()
     {
         CastColliderRays();
-        if (collided || wallNear)
+        if (collided)
         {
-            gl.setCurrSpeed(0f);
+            gl.SetCurrSpeed(0f);
             if (AIStone)
             {
                 rb.velocity = new Vector3(0f, 0f, 0f);
@@ -46,15 +46,14 @@ public class CollisionHandler : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Wall") && gameObject.layer == 8)
         {
-            Debug.Log("Bounced off surface");
-            StartCoroutine(bounceAdjustment(collision)); 
+            StartCoroutine(BounceAdjustment(collision));
         }
     }
 
     /// <summary>
     /// Raycasts out from centre of stone in several directions to check if any other stones are within collision range
     /// </summary>
-    private void CastColliderRays()  
+    private void CastColliderRays()
     {
         //selected raycasts as hit will contain point of contact information 
         Vector3[] directionsToCast = { transform.forward, transform.right, -(transform.forward), -(transform.right) };
@@ -96,35 +95,19 @@ public class CollisionHandler : MonoBehaviour
     {
         rb = gameObject.GetComponent<Rigidbody>();
         originalPosition = transform.position;
-                                                    //0.325 is the size of the object in x and z
+        //0.325 is the size of the object in x and z
         Debug.DrawRay(transform.GetChild(1).position, direction.normalized * 0.325f);
-        if (Physics.Raycast(transform.GetChild(1).position, direction.normalized, out RaycastHit hit, 0.325f, playerLayer, QueryTriggerInteraction.Ignore) && !bounced)
+        if (Physics.Raycast(transform.GetChild(1).position, direction.normalized, out RaycastHit hit, 0.325f, playerLayer | enemyLayer, QueryTriggerInteraction.Ignore) && !bounced && !hit.collider.CompareTag("CurrStone"))
         {
-            Debug.Log("Collision between player stones");
-           
+
             if (rb)
             {
                 AIStone = true;
             }
-            
             StartCoroutine(HandlePlayerStoneCollision(hit.collider, hit.point));
         }
-        //if raycast into wall | attempt to prevent passing through walls due to high speed collisions 
-        else if (Physics.Raycast(transform.GetChild(1).position, direction.normalized, 0.325f, wallLayer, QueryTriggerInteraction.Ignore))
-        {
-            wallNear = true;
-             if (rb)
-            {
-                rb.velocity = new Vector3(0f, 0f, 0f);
-            }
-        }
-        //if raycast hits nothing, then wall cant be close, called so frequently that wallNear will be reset quickly anyway
-        else
-        {
-            wallNear = false;
-        }
     }
-    
+
     /// <summary>
     /// Handles what to do when a player stone collides with another player stone
     /// </summary>
@@ -143,14 +126,14 @@ public class CollisionHandler : MonoBehaviour
         //due to the rb, need lower collision multiplier 
         if (AIStone)
         {
-            collisionMultiplier = gl.getCurrSpeed() > 3.25 ? 2.5f : gl.getCurrSpeed() > 2 ? 1.5f : 1f;
+            collisionMultiplier = gl.GetCurrSpeed() > 5.25 ? 1f : gl.GetCurrSpeed() > 3 ? 1.5f : 2f;
         }
         else
         {
-            collisionMultiplier = gl.getCurrSpeed() > 3.25 ? 4f : gl.getCurrSpeed() > 2 ? 2f : 1f;
+            collisionMultiplier = gl.GetCurrSpeed() > 5.25 ? 0.5f : gl.GetCurrSpeed() > 3 ? 2f : 2f;
         }
         collided = true;
-        
+
         //applies force to stone and gradually slows it to simulate it being knocked 
         while (collisionMultiplier > 0.1f)
         {
@@ -173,28 +156,28 @@ public class CollisionHandler : MonoBehaviour
     /// </summary>
     /// <param name="col">collider</param>
     /// <returns></returns>
-    private IEnumerator bounceAdjustment(Collision wallCol)
+    private IEnumerator BounceAdjustment(Collision wallCol)
     {
         float newSpeed;
         Vector3 prevPos, newPos;
-        gl.setBouncedOffWall(true);
+        gl.SetBouncedOffWall(true);
         bounced = true;
 
         //make the new direction the contact point's normal 
-        Vector3 direction = Vector3.Reflect(gl.getCurrVelocity(), wallCol.contacts[0].normal);
+        Vector3 direction = Vector3.Reflect(gl.GetCurrVelocity(), wallCol.contacts[0].normal);
         //as centre child determines travelling direction, make the forward vector this new direction (y axis is excluded as not relevant)
         transform.GetChild(1).forward = new Vector3(direction.x, 0f, direction.z);
 
-        newSpeed = gl.getCurrSpeed() > 3 ? 0.15f : gl.getCurrSpeed() > 2 ? 0.25f : gl.getCurrSpeed() > 1 ? 0.5f : 1f;
+        newSpeed = gl.GetCurrSpeed() > 6 ? 0.1f : gl.GetCurrSpeed() > 4 ? 0.15f : gl.GetCurrSpeed() > 1 ? 0.4f : 1f;
 
         //slow the object to a stop 
         while (newSpeed >= 0.01f)
         {
             prevPos = transform.position;
-            newPos = prevPos + direction * (gl.getCurrSpeed() * newSpeed) * Time.fixedDeltaTime;
+            newPos = prevPos + direction * (gl.GetCurrSpeed() * newSpeed) * Time.fixedDeltaTime;
             transform.position = newPos;
             newSpeed *= 0.99f;
-            gl.setCurrSpeed((newPos - prevPos).magnitude / Time.fixedDeltaTime);
+            gl.SetCurrSpeed((newPos - prevPos).magnitude / Time.fixedDeltaTime);
             yield return null;
         }
         bounced = false;

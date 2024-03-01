@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraToggle : MonoBehaviour
@@ -9,17 +7,16 @@ public class CameraToggle : MonoBehaviour
     private Camera mainCam;
     private bool mainIsEnabled = true;
     private GameStateManager gsm;
-    // Start is called before the first frame update
+
     void Start()
     {
         mainCam = Camera.main;
         gsm = GameStateManager.GSMInstance;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Y) && (gsm.getCurrState() == GameStateManager.MenuStates.Play))
+        if (Input.GetKeyDown(KeyCode.Y) && (gsm.GetCurrState() == GameStateManager.MenuStates.Play))
         {
             mainIsEnabled = !mainIsEnabled;
             mainCam.enabled = mainIsEnabled;

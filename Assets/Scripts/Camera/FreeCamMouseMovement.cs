@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FreeCamMovement : MonoBehaviour
@@ -31,12 +29,10 @@ public class FreeCamMovement : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
     }
 
-    //Rotating done in LateUpdate as rotations done in Update can sometimes be jittery
     private void LateUpdate()
     {
         //rotates the camera by the mouse rotation 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
         rbHolder.rotation = Quaternion.Euler(0, yRotation, 0);
-
     }
 }

@@ -33178,7 +33178,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 149353787}
         m_TargetAssemblyTypeName: MenuScript, Assembly-CSharp
-        m_MethodName: btnOptions
+        m_MethodName: BtnOptions
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -38358,7 +38358,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 149353787}
         m_TargetAssemblyTypeName: MenuScript, Assembly-CSharp
-        m_MethodName: btnPlay
+        m_MethodName: BtnPlay
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -65314,7 +65314,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 149353787}
         m_TargetAssemblyTypeName: MenuScript, Assembly-CSharp
-        m_MethodName: btnQuit
+        m_MethodName: BtnQuit
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -66098,7 +66098,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 722688394}
         m_TargetAssemblyTypeName: OptionsMenu, Assembly-CSharp
-        m_MethodName: btnBack
+        m_MethodName: BtnBack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

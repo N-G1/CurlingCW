@@ -2,13 +2,14 @@ using UnityEngine;
 public class RotateArrow : MonoBehaviour
 {
     private PlayStateManager psm;
+
     void Start()
     {
         psm = PlayStateManager.PSMInstance;
     }
     void Update()
     {
-        if (psm.getPlayState() == PlayStateManager.PlayStates.Aiming)
+        if (psm.GetPlayState() == PlayStateManager.PlayStates.Aiming)
         {
             //allows for the consitent back and fourth motion, once time.time * 0.85f > 1, resets back to 0 and so on 
             float rotation = Mathf.PingPong(Time.time * 0.85f, 1f);
@@ -19,7 +20,7 @@ public class RotateArrow : MonoBehaviour
             //only rotate in x is neccessary 
             transform.rotation = Quaternion.Euler(0f, rotationWindow, 0f);
         }
-        else if (psm.getPlayState() == PlayStateManager.PlayStates.EnemyTurn)
+        else if (psm.GetPlayState() == PlayStateManager.PlayStates.EnemyTurn)
         {
             float rotation = Mathf.PingPong(Time.time * 0.85f, 1f);
             float rotationWindow = 0f;

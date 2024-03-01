@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FreeCamControl : MonoBehaviour
@@ -9,7 +7,6 @@ public class FreeCamControl : MonoBehaviour
     private Rigidbody rb;
 
     [SerializeField] private Transform camOrientation;
-
 
     private void Start()
     {
@@ -28,7 +25,7 @@ public class FreeCamControl : MonoBehaviour
         //otherwise wasd will always travel in the same direction regardless of where you are looking
         movDirection = camOrientation.forward * vertInput + camOrientation.right * horizInput;
         
-        //cameras on rbs can be choppy so lerp to somewhat smooth movement out 
+        //cameras on rbs can be choppy so lerp to smooth 
         rb.velocity = Vector3.Lerp(rb.velocity, movDirection.normalized * 10f, Time.fixedDeltaTime * 5f);
     }
 }

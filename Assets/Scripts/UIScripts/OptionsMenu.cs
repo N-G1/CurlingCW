@@ -14,10 +14,10 @@ public class OptionsMenu : MonoBehaviour
 
     void Start()
     {
-        sliderAI.onValueChanged.AddListener(onAIChanged);
-        sliderStone.onValueChanged.AddListener(onStonesChanged);
-        sliderEnds.onValueChanged.AddListener(onEndsChanged);
-        sliderVolume.onValueChanged.AddListener(onVolumeChanged);
+        sliderAI.onValueChanged.AddListener(OnAIChanged);
+        sliderStone.onValueChanged.AddListener(OnStonesChanged);
+        sliderEnds.onValueChanged.AddListener(OnEndsChanged);
+        sliderVolume.onValueChanged.AddListener(OnVolumeChanged);
 
         sliderAI.value = PlayerPrefs.GetInt("AIDifficulty");
         sliderStone.value = PlayerPrefs.GetInt("Stones");
@@ -32,25 +32,25 @@ public class OptionsMenu : MonoBehaviour
         txtEnds.text = PlayerPrefs.GetInt("Ends").ToString();
         txtVolume.text = (PlayerPrefs.GetFloat("Volume") * 100f).ToString();
     }
-    void onAIChanged(float val)
+    void OnAIChanged(float val)
     {
         PlayerPrefs.SetInt("AIDifficulty",  Mathf.RoundToInt(val));
     }
-    void onStonesChanged(float val)
+    void OnStonesChanged(float val)
     {
         PlayerPrefs.SetInt("Stones", Mathf.RoundToInt(val));
     }
-    void onEndsChanged(float val)
+    void OnEndsChanged(float val)
     {
         PlayerPrefs.SetInt("Ends", Mathf.RoundToInt(val));
     }
 
-    void onVolumeChanged(float val)
+    void OnVolumeChanged(float val)
     {
         PlayerPrefs.SetFloat("Volume", val/100f);
     }
 
-    public void btnBack()
+    public void BtnBack()
     {
         menu.enabled = true;
         options.enabled = false;

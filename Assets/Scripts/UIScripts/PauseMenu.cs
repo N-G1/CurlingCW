@@ -9,13 +9,13 @@ public class PauseMenu : MonoBehaviour
     }
     public void btnContinue()
     {
-        gsm.setCurrState(GameStateManager.MenuStates.Play);
-        gsm.setPrevState(GameStateManager.MenuStates.Pause);
+        gsm.SetCurrState(GameStateManager.MenuStates.Play);
+        gsm.SetPrevState(GameStateManager.MenuStates.Pause);
     }
 
     public void btnMenu()
     {
-        gsm.setCurrState(GameStateManager.MenuStates.MainMenu);
+        gsm.SetCurrState(GameStateManager.MenuStates.MainMenu);
         Time.timeScale = 1;
 
     }
