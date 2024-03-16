@@ -90,7 +90,10 @@ public class GameStateManager : MonoBehaviour
         CursorUnlock();
         pauseUI.enabled = true;
         gameUI.enabled = false;
-        camAudioSource.Pause();
+        if (psm.GetPlayState() != PlayStateManager.PlayStates.Aiming)
+        {
+            camAudioSource.Pause();
+        }  
     }
 
     private void Play()

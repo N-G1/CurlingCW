@@ -47,5 +47,9 @@ public class AIStonePhysics : MonoBehaviour
             Vector3 direction = otherStone.transform.position - transform.position;
             otherStone.AddForce(-direction.normalized * 1.5f, ForceMode.Impulse);
         }
+        else if (collision.gameObject.CompareTag("Wall"))
+        {
+
+        }
     }
 }

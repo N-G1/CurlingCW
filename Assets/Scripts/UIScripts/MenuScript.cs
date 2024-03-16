@@ -11,8 +11,8 @@ public class MenuScript : MonoBehaviour
         {
             PlayerPrefs.SetInt("PrevLoaded", 1);
             PlayerPrefs.SetInt("AIDifficulty", 2);
-            PlayerPrefs.SetInt("Ends", 3);
-            PlayerPrefs.SetInt("Stones", 4);
+            PlayerPrefs.SetInt("Ends", 1);
+            PlayerPrefs.SetInt("Stones", 2);
             PlayerPrefs.SetFloat("Volume", 0.10f);
         }
         Application.targetFrameRate = 60;

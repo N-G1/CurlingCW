@@ -14,7 +14,7 @@ public class GameLoop : MonoBehaviour
     [SerializeField] private Transform pivot;
     [SerializeField] private Transform cameraPos;
     [SerializeField] private Transform target;
-    
+
 
     [SerializeField] private TextMeshProUGUI txtTurn;
 
@@ -35,6 +35,7 @@ public class GameLoop : MonoBehaviour
     private bool ended = false;
     private bool enemyFired = false, enemyActive = false;
     private bool bouncedOffWall = false;
+    private bool collided = false;
 
     private const float slideModifier = 0.05f; //small modifier applied to simulate longer sliding
     private float velocityModifier = 13f; //initial force applied
@@ -78,7 +79,7 @@ public class GameLoop : MonoBehaviour
     void Update()
     {
         ended = CheckGameEnded();
-        
+
         //enables audio
         if ((currentSpeed < 0.6f && teamInPlay == 1) || (teamInPlay == 2 && stoneRb.velocity.magnitude < 0.03f))
         {
@@ -103,12 +104,12 @@ public class GameLoop : MonoBehaviour
                 if (enemyFired)
                 {
                     VelocityCheck();
-                }          
-            }  
+                }
+            }
         }
     }
 
-    //apply slide modifier
+    //apply slide modifier to AI stone
     void FixedUpdate()
     {
         if (moving && teamInPlay == 2)
@@ -128,7 +129,7 @@ public class GameLoop : MonoBehaviour
             psm.SetPlayState(PlayStateManager.PlayStates.Directing);
             psm.SetPrevPlayState(PlayStateManager.PlayStates.Aiming);
             moving = true;
-            StartCoroutine(HandlePhysics());      
+            StartCoroutine(HandlePhysics());
         }
     }
 
@@ -169,15 +170,16 @@ public class GameLoop : MonoBehaviour
                     psm.SetPlayState(PlayStateManager.PlayStates.Aiming);
                     teamInPlay = 1;
                 }
-                
-                stone.tag = "CurrStone"; 
-                
+
+                stone.tag = "CurrStone";
+                collided = false;
+
 
                 mainCam.transform.position = stone.transform.GetChild(0).position;
                 //mainCam.transform.rotation = Quaternion.Euler(mainCam.transform.rotation.x, 0f, mainCam.transform.rotation.z);
                 mainCam.transform.parent = stone.transform.GetChild(0);
                 timeUnderVelocity = 0f;
-            }   
+            }
         }
     }
 
@@ -211,7 +213,7 @@ public class GameLoop : MonoBehaviour
         velocityModifier = 8.25f; //3.75
         bool sweepedThisFrame = false;
 
-        while (moving && velocityModifier >= 0.25f && !bouncedOffWall)
+        while (moving && velocityModifier >= 0.25f && !bouncedOffWall && !collided)
         {
             //prefab is off centre, so instead rotate around child gameobject at centre of pivot 
             stoneCentre = stone.transform.GetChild(1).transform;
@@ -231,7 +233,7 @@ public class GameLoop : MonoBehaviour
                 //rotate the stone around the central gameobject, rotate camera in opposite direction so it stays stationary
                 stone.transform.RotateAround(stoneCentre.position, Vector3.up, horizInput * (10f * rotModifier) * Time.fixedDeltaTime);
                 stone.transform.GetChild(0).transform.RotateAround(stoneCentre.position, Vector3.down, horizInput * (10f * rotModifier) * Time.fixedDeltaTime);
-                 
+
                 sweepedThisFrame = true;
 
                 //interpolates between previous direction and new direction, more realistic turning when switching from pivot direction
@@ -293,7 +295,7 @@ public class GameLoop : MonoBehaviour
                 float angle = Vector3.Angle(pivot.forward, pivot.position - target.position);
                 Debug.Log("Angle is " + angle);
 
-                maxAngle = PlayerPrefs.GetInt("AIDifficulty") == 1 ? 45 : 
+                maxAngle = PlayerPrefs.GetInt("AIDifficulty") == 1 ? 45 :
                            PlayerPrefs.GetInt("AIDifficulty") == 2 ? 25 : 18;
 
                 //Equation I trial and errored until I found something I liked
@@ -323,7 +325,7 @@ public class GameLoop : MonoBehaviour
                     StartCoroutine(AIDirectingDecisions());
                 }
             }
-        }    
+        }
     }
 
     /// <summary>
@@ -374,7 +376,7 @@ public class GameLoop : MonoBehaviour
         Vector3 movementDirection = new Vector3(-horizInput, 0f, 0f).normalized;
 
         stoneRb.AddForce(movementDirection * 5f);
-        Debug.Log("curled from: " + sideOfTarget );
+        Debug.Log("curled from: " + sideOfTarget);
     }
 
     public void SetEnded(bool val)
@@ -397,5 +399,9 @@ public class GameLoop : MonoBehaviour
     public void SetBouncedOffWall(bool val)
     {
         bouncedOffWall = val;
+    }
+    public void SetCollided(bool b)
+    {
+        collided = b;
     }
 }
